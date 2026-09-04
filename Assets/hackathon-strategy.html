@@ -1,0 +1,484 @@
+<title>Hackathon Battle Plan</title>
+<style>
+  :root{
+    --bg:#faf9f7; --surface:#ffffff; --surface-2:#f2f0ec;
+    --ink:#1c1a17; --ink-2:#55504a; --ink-3:#8a837a;
+    --line:#e3dfd8; --line-2:#cfc9bf;
+    --accent:#b4531f; --accent-soft:#fbeee5;
+    --good:#2f6b46; --good-soft:#e8f2ec;
+    --warn:#8a6410; --warn-soft:#fbf1dc;
+    --bad:#9c2f2f; --bad-soft:#f8e9e7;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#16150f; --surface:#1e1d17; --surface-2:#26241d;
+      --ink:#f0ece4; --ink-2:#b8b2a7; --ink-3:#8a8478;
+      --line:#332f27; --line-2:#463f34;
+      --accent:#e5904f; --accent-soft:#33231a;
+      --good:#7fc79c; --good-soft:#1a2a21;
+      --warn:#dcb45e; --warn-soft:#2b2517;
+      --bad:#e08b84; --bad-soft:#2d1a19;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#16150f; --surface:#1e1d17; --surface-2:#26241d;
+    --ink:#f0ece4; --ink-2:#b8b2a7; --ink-3:#8a8478;
+    --line:#332f27; --line-2:#463f34;
+    --accent:#e5904f; --accent-soft:#33231a;
+    --good:#7fc79c; --good-soft:#1a2a21;
+    --warn:#dcb45e; --warn-soft:#2b2517;
+    --bad:#e08b84; --bad-soft:#2d1a19;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:940px; margin:0 auto; padding:0 24px 96px}
+
+  /* ---- masthead ---- */
+  header.top{
+    border-bottom:1px solid var(--line);
+    padding:56px 0 32px; margin-bottom:44px;
+  }
+  .kicker{
+    font:600 11px/1 var(--mono); letter-spacing:.16em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:16px;
+  }
+  h1{
+    font-size:clamp(34px,5.5vw,52px); line-height:1.05; letter-spacing:-.025em;
+    margin:0 0 16px; font-weight:660;
+  }
+  .lede{font-size:19px; line-height:1.55; color:var(--ink-2); max-width:62ch; margin:0}
+  .stamp{
+    margin-top:24px; font:500 13px/1 var(--mono); color:var(--ink-3);
+  }
+
+  h2{
+    font-size:13px; font-weight:650; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-3); margin:64px 0 20px; padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+  }
+  h3{font-size:21px; letter-spacing:-.012em; margin:36px 0 10px; font-weight:640}
+  p{margin:0 0 16px; max-width:74ch}
+  a{color:var(--accent)}
+  strong{font-weight:640}
+  code{
+    font:500 .88em var(--mono); background:var(--surface-2);
+    padding:.12em .38em; border-radius:4px; border:1px solid var(--line);
+  }
+
+  /* ---- verdict banner ---- */
+  .verdict{
+    background:var(--good-soft); border:1px solid var(--good);
+    border-left-width:4px; border-radius:8px; padding:22px 26px; margin:0 0 8px;
+  }
+  .verdict .h{font-weight:660; font-size:17px; margin:0 0 8px; color:var(--good)}
+  .verdict p{margin:0; color:var(--ink)}
+
+  /* ---- comparison table ---- */
+  .scroll{overflow-x:auto; margin:24px 0; -webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse; width:100%; min-width:620px; font-size:14.5px}
+  th,td{
+    text-align:left; padding:12px 14px; border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  thead th{
+    font:650 11px/1.3 var(--mono); letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-3); border-bottom:2px solid var(--line-2); white-space:nowrap;
+  }
+  tbody th{font-weight:600; color:var(--ink-2); white-space:nowrap}
+  tbody tr:last-child td, tbody tr:last-child th{border-bottom:none}
+  .win{background:var(--good-soft)}
+  .lose{color:var(--ink-2)}
+
+  /* ---- pills ---- */
+  .pill{
+    display:inline-block; font:650 10.5px/1 var(--mono); letter-spacing:.09em;
+    text-transform:uppercase; padding:5px 9px; border-radius:20px; white-space:nowrap;
+  }
+  .p-good{background:var(--good-soft); color:var(--good)}
+  .p-warn{background:var(--warn-soft); color:var(--warn)}
+  .p-bad{background:var(--bad-soft); color:var(--bad)}
+  .p-accent{background:var(--accent-soft); color:var(--accent)}
+
+  /* ---- rule cards ---- */
+  .rules{display:grid; gap:14px; margin:24px 0}
+  .rule{
+    background:var(--surface); border:1px solid var(--line); border-radius:8px;
+    padding:16px 20px; display:grid; grid-template-columns:auto 1fr; gap:16px;
+    align-items:start;
+  }
+  .rule .n{
+    font:650 12px/1 var(--mono); color:var(--accent); background:var(--accent-soft);
+    width:26px; height:26px; display:grid; place-items:center; border-radius:6px;
+  }
+  .rule .t{font-weight:640; margin:0 0 4px}
+  .rule .d{margin:0; font-size:14.5px; color:var(--ink-2)}
+  .rule.danger{border-color:var(--bad); background:var(--bad-soft)}
+  .rule.danger .n{background:var(--bad); color:#fff}
+
+  /* ---- timeline ---- */
+  ol.timeline{list-style:none; padding:0; margin:24px 0; counter-reset:tl}
+  ol.timeline li{
+    counter-increment:tl; position:relative; padding:0 0 26px 46px;
+    border-left:2px solid var(--line); margin-left:13px;
+  }
+  ol.timeline li:last-child{border-left-color:transparent; padding-bottom:0}
+  ol.timeline li::before{
+    content:counter(tl); position:absolute; left:-14px; top:-2px;
+    width:26px; height:26px; border-radius:50%; background:var(--accent);
+    color:#fff; font:650 12px/26px var(--mono); text-align:center;
+  }
+  ol.timeline .when{
+    font:650 11px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-3); display:block; margin-bottom:5px;
+  }
+  ol.timeline .what{font-weight:640; display:block; margin-bottom:4px}
+  ol.timeline .why{font-size:14.5px; color:var(--ink-2)}
+
+  /* ---- proposals ---- */
+  .prop{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:26px 28px; margin:0 0 18px;
+  }
+  .prop.star{border-color:var(--accent); border-width:2px}
+  .prop-head{
+    display:flex; flex-wrap:wrap; gap:10px 14px; align-items:baseline;
+    margin-bottom:6px;
+  }
+  .prop-head h3{margin:0; font-size:22px}
+  .prop .tag{font:600 13px/1 var(--mono); color:var(--ink-3)}
+  .prop .pitch{font-size:16.5px; color:var(--ink); margin:10px 0 18px}
+  .grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px}
+  .box .lbl{
+    font:650 10.5px/1 var(--mono); letter-spacing:.11em; text-transform:uppercase;
+    color:var(--ink-3); display:block; margin-bottom:7px;
+  }
+  .box p{font-size:14.5px; margin:0; color:var(--ink-2)}
+  .box ul{font-size:14.5px; margin:0; padding-left:18px; color:var(--ink-2)}
+  .box li{margin-bottom:4px}
+  .money{
+    margin-top:18px; padding-top:16px; border-top:1px dashed var(--line-2);
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  }
+  .money .amt{font:660 19px/1 var(--mono); color:var(--good)}
+  .money .brk{font-size:13.5px; color:var(--ink-3)}
+
+  .note{
+    background:var(--warn-soft); border-left:3px solid var(--warn);
+    padding:14px 18px; border-radius:0 6px 6px 0; margin:18px 0; font-size:14.5px;
+  }
+  .note b{color:var(--warn)}
+
+  footer{
+    margin-top:72px; padding-top:24px; border-top:1px solid var(--line);
+    font-size:13.5px; color:var(--ink-3);
+  }
+  @media(max-width:600px){
+    .wrap{padding:0 18px 64px}
+    .prop{padding:20px}
+    header.top{padding-top:36px}
+  }
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="kicker">Decision Document · September 2026</div>
+  <h1>Two hackathons,<br>one realistic bet.</h1>
+  <p class="lede">A side-by-side read of the RevenueCat Shipaton and the Amazon Developer Hackathon — what the rules actually gate on, where the competition is thin, and five projects worth building.</p>
+  <div class="stamp">Prepared 4 Sep 2026</div>
+</header>
+
+<div class="verdict">
+  <p class="h">Verdict: enter Amazon. Treat the Shipaton as optional.</p>
+  <p>Amazon gives you 22 more days, roughly 18× fewer competitors per prize dollar, and — decisively — <strong>no app-store gate</strong>. The deliverable is a GitHub repo and a 3-minute video, which is the format that plays to your strengths. The Shipaton's real obstacle was never writing the app; it was Google Play's mandatory 12-tester × 14-day window colliding with a 27-day deadline.</p>
+</div>
+
+<h2>The numbers side by side</h2>
+
+<div class="scroll">
+<table>
+  <thead>
+    <tr><th></th><th>RevenueCat Shipaton</th><th>Amazon Developer Hackathon</th></tr>
+  </thead>
+  <tbody>
+    <tr><th>Deadline</th>
+      <td class="lose">1 Oct 2026 — <b>27 days</b></td>
+      <td class="win">23 Oct 2026 — <b>49 days</b></td></tr>
+    <tr><th>Participants</th>
+      <td class="lose">23,082</td>
+      <td class="win"><b>1,263</b></td></tr>
+    <tr><th>Prize pool</th>
+      <td>$740,000</td>
+      <td>$138,000</td></tr>
+    <tr><th>Density</th>
+      <td class="lose">~$32 per participant</td>
+      <td class="win"><b>~$109 per participant</b></td></tr>
+    <tr><th>Deliverable</th>
+      <td class="lose">Live app published to a real store</td>
+      <td class="win">GitHub repo + 3-min video</td></tr>
+    <tr><th>Cost to enter</th>
+      <td class="lose">$25 Play and/or $99/yr Apple (+ a Mac)</td>
+      <td class="win"><b>$0</b></td></tr>
+    <tr><th>Hard blockers</th>
+      <td class="lose">Store review, 14-day tester window, country exclusions</td>
+      <td class="win">None — simulators and self-hosting are permitted</td></tr>
+    <tr><th>Judged on</th>
+      <td class="lose">Traction, revenue, growth momentum</td>
+      <td class="win">The build itself, plus your written feedback</td></tr>
+    <tr><th>Prize stacking</th>
+      <td>One app, several categories</td>
+      <td>1 track + 1 mini challenge = up to <b>$35k</b></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Rules that actually decide the outcome</h2>
+
+<h3>RevenueCat Shipaton</h3>
+<div class="rules">
+  <div class="rule danger">
+    <div class="n">!</div>
+    <div><p class="t">Google Play's closed-testing requirement is the deadline killer</p>
+    <p class="d">New <em>personal</em> developer accounts must run closed testing with 12 opted-in testers for 14 continuous days before production release. With 27 days left, registration has to happen immediately. An <em>organization</em> account skips this but needs a D-U-N-S number, which itself takes days.</p></div>
+  </div>
+  <div class="rule danger">
+    <div class="n">!</div>
+    <div><p class="t">The app must be brand new</p>
+    <p class="d">First public release strictly between 1 Aug and 30 Sep 2026. Updates to anything previously shipped are disqualified outright.</p></div>
+  </div>
+  <div class="rule">
+    <div class="n">1</div>
+    <div><p class="t">RevenueCat SDK must power a real purchase</p>
+    <p class="d">At least one in-app or web purchase, or ads served through RevenueCat Ads. This is genuinely about an hour of work with <code>react-native-purchases</code>.</p></div>
+  </div>
+  <div class="rule">
+    <div class="n">2</div>
+    <div><p class="t">Judges must be able to reach the paid tier</p>
+    <p class="d">Ship either a free trial or a promo code. Forgetting this invalidates an otherwise complete entry.</p></div>
+  </div>
+  <div class="rule">
+    <div class="n">3</div>
+    <div><p class="t">Exact asset specs</p>
+    <p class="d">Demo video ≤ 2 minutes on public YouTube/Vimeo, 1024×1024 icon, and at least one screenshot at 1179 × 2556 with no device frame. No third-party trademarks or licensed music.</p></div>
+  </div>
+  <div class="rule">
+    <div class="n">4</div>
+    <div><p class="t">Check the country exclusions first</p>
+    <p class="d">Specific territories are barred. Verify eligibility in the official rules before spending a single dollar on a developer account.</p></div>
+  </div>
+</div>
+
+<h3>Amazon Developer Hackathon</h3>
+<div class="rules">
+  <div class="rule">
+    <div class="n">1</div>
+    <div><p class="t">The repo must actually call the technology</p>
+    <p class="d">For Alexa+, Bee and Ring, judges look for a real import, entry point, or loaded MCP config in the source — not a README mention. Fire TV is the sole exception: any framework passes, provided the video shows it running on a device or simulator.</p></div>
+  </div>
+  <div class="rule">
+    <div class="n">2</div>
+    <div><p class="t">Public repo, open-source licence, visible in About</p>
+    <p class="d">The licence must be surfaced at the top of the repo, not buried in a file. This same requirement also satisfies most of the Open Source mini challenge.</p></div>
+  </div>
+  <div class="rule">
+    <div class="n">3</div>
+    <div><p class="t">Alexa+ has a guaranteed escape hatch</p>
+    <p class="d">Self-hosted MCP server (spec 2025-11-25+, Streamable HTTP) or an Agent Skill — <em>or</em> a simulated Alexa+ experience as a web app, with no required framework. You cannot be hard-blocked on this track.</p></div>
+  </div>
+  <div class="rule danger">
+    <div class="n">!</div>
+    <div><p class="t">Bee requires hardware you don't have</p>
+    <p class="d">The demo must use live data from a Bee device or an Apple Watch running Bee software. Skip this track.</p></div>
+  </div>
+  <div class="rule">
+    <div class="n">4</div>
+    <div><p class="t">Product feedback is mandatory, not decorative</p>
+    <p class="d">Every tool, API and SDK you touched: what you used it for, what worked, what didn't, how onboarding felt, whether you'd use it again. Amazon is running this hackathon to harvest exactly this.</p></div>
+  </div>
+  <div class="rule">
+    <div class="n">5</div>
+    <div><p class="t">Friction logs carry up to a 10% judging bonus</p>
+    <p class="d">Task attempted, steps taken, expected vs. actual, severity, workaround, actionable suggestion. Optional — which means most entrants will skip it. This is the cheapest 10% in either competition.</p></div>
+  </div>
+  <div class="rule">
+    <div class="n">6</div>
+    <div><p class="t">One project can win one track + one mini challenge</p>
+    <p class="d">Not two tracks. So build one thing well and layer both mini challenges onto it.</p></div>
+  </div>
+</div>
+
+<h2>The smart strategy</h2>
+
+<p>The governing insight is that <strong>these two events are won on completely different axes.</strong> The Shipaton's headline categories reward traction and revenue — outcomes you cannot manufacture in four weeks from a standing start against 23,000 people. Amazon rewards a working integration and a thoughtful write-up, both of which are fully within your control and finishable on a known schedule.</p>
+
+<p>So: stop optimising for the biggest number on the page. Optimise for <em>the prize whose judging criterion is a checklist you can complete.</em></p>
+
+<h3>Target the Alexa+ track</h3>
+<p>It carries the joint-highest prize in the Amazon event ($25k / $15k / $4k), needs <strong>zero hardware</strong>, and rests on MCP — a spec you already work inside daily. The simulated-web-app fallback removes tail risk entirely.</p>
+
+<h3>Stack both mini challenges onto the same project</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>Prize</th><th>What it costs you</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Alexa+ Track, 1st</td><td>The project itself</td><td><b>$25,000</b> + $15k AWS credits</td></tr>
+    <tr><td>Open Source Mini</td><td>A licence file you're required to add anyway, plus one PR to any public repo</td><td><b>$5,000</b> + $5k credits</td></tr>
+    <tr><td>AWS Builder Mini</td><td>Route LLM calls through Bedrock instead of a direct API; document it</td><td><b>$5,000</b> + $5k credits</td></tr>
+  </tbody>
+</table>
+</div>
+<p>One well-built MCP server is therefore eligible for <strong>$35,000 in cash</strong> plus $25,000 in AWS credits. The two mini challenges together represent perhaps a day of additional work.</p>
+
+<h3>Write the friction log as you build</h3>
+<p>Keep a running file open from day one. Every time something surprises you — bad error message, missing doc, confusing auth flow — log it on the spot with severity and a concrete suggestion. Reconstructing this at the end produces something obviously thin; capturing it live produces the single most differentiated part of your submission.</p>
+
+<div class="note">
+  <b>On the Shipaton:</b> it stays viable only if you register a Play developer account this week, so the 14-day tester clock runs in the background while you build for Amazon. If that registration slips past roughly 10 September, drop it and commit fully to Amazon. Do not build two apps.
+</div>
+
+<h3>Sequence</h3>
+<ol class="timeline">
+  <li><span class="when">Day 0 — today</span><span class="what">Register for the Amazon hackathon; create the public repo with an MIT licence visible in About</span><span class="why">The licence requirement is trivial now and easy to forget later. Registering locks in access to the SDKs and office hours.</span></li>
+  <li><span class="when">Days 1–3</span><span class="what">Set up the Alexa+ dev environment and get a hello-world MCP server responding over Streamable HTTP</span><span class="why">Prove the riskiest technical link first. If self-hosting fights you, you learn it now — while the simulated-web-app fallback is still cheap to pivot to.</span></li>
+  <li><span class="when">Days 4–20</span><span class="what">Build the real tool surface, wired to Bedrock</span><span class="why">Bedrock instead of a direct API call is what converts this into an AWS Builder entry at essentially no cost.</span></li>
+  <li><span class="when">Days 21–30</span><span class="what">Harden, write the README so a judge can run it in five minutes, submit one PR to a public repo</span><span class="why">Judges who can't run your project fall back on the video alone. A runnable repo is a real scoring advantage.</span></li>
+  <li><span class="when">Days 31–42</span><span class="what">Record the demo video; lead with the strongest 30 seconds</span><span class="why">Judges aren't required to watch past three minutes. Front-load the payoff, explain the architecture second.</span></li>
+  <li><span class="when">Days 43–49</span><span class="what">Write the product feedback and friction log; submit with buffer</span><span class="why">Never submit on deadline day. Devpost submission forms have more required fields than anyone expects.</span></li>
+</ol>
+
+<h2>Five proposals</h2>
+<p>All five target <strong>Alexa+</strong> and stack both mini challenges. Each is scoped to be genuinely buildable in 49 days, and each is chosen so the <em>demo is convincing on video</em> — the format the judging actually runs on.</p>
+
+<div class="prop star">
+  <div class="prop-head">
+    <h3>1 · Recall</h3>
+    <span class="tag">Alexa+ MCP · voice spaced repetition</span>
+    <span class="pill p-accent">Top pick</span>
+  </div>
+  <p class="pitch">A spaced-repetition study system exposed as MCP tools, so Alexa+ quizzes you out loud while you cook, drive, or fold laundry — and grades your spoken answer for meaning, not exact wording.</p>
+  <div class="grid2">
+    <div class="box"><span class="lbl">Tool surface</span>
+      <ul><li><code>list_due_cards</code></li><li><code>grade_response</code> — semantic, via Bedrock</li><li><code>add_card</code> from spoken input</li><li><code>get_streak_summary</code></li></ul>
+    </div>
+    <div class="box"><span class="lbl">Why it wins</span>
+      <p>Voice is genuinely the <em>correct</em> modality for recall drills — free recall beats visual recognition, which is a real cognitive-science result. That makes the demo persuasive rather than gimmicky, which is the difference between a project that looks like a tech demo and one that looks like a product. Hits the "education" priority use case.</p>
+    </div>
+    <div class="box"><span class="lbl">Build risk</span>
+      <p><span class="pill p-good">Low</span> SQLite + the SM-2 algorithm (well-documented, ~60 lines). No third-party APIs, no auth, no hardware.</p>
+    </div>
+    <div class="box"><span class="lbl">Demo shape</span>
+      <p>"Alexa, quiz me on my biology deck." Answer aloud, slightly wrong. It catches the nuance, explains, reschedules the card. That's the whole 90 seconds.</p>
+    </div>
+  </div>
+  <div class="money"><span class="amt">$35,000</span><span class="brk">Alexa+ 1st + Open Source + AWS Builder</span></div>
+</div>
+
+<div class="prop">
+  <div class="prop-head">
+    <h3>2 · Handoff</h3>
+    <span class="tag">Alexa+ MCP · household operations</span>
+  </div>
+  <p class="pitch">Shared household state — lists, chores, who's collecting whom — as an MCP server, so any family member can query or update it by voice without opening an app or negotiating over a group chat.</p>
+  <div class="grid2">
+    <div class="box"><span class="lbl">Tool surface</span>
+      <ul><li><code>get_open_items</code> filtered by person</li><li><code>claim_task</code> / <code>complete_task</code></li><li><code>add_to_list</code> with dedupe</li><li><code>whos_doing_what</code> — daily rollup</li></ul>
+    </div>
+    <div class="box"><span class="lbl">Why it wins</span>
+      <p>Sits squarely in the "personal productivity" priority, and the multi-user angle shows off something a single-user app can't: shared state resolved through natural language. Unglamorous, but judges reward integrations that look like they'd survive contact with a real household.</p>
+    </div>
+    <div class="box"><span class="lbl">Build risk</span>
+      <p><span class="pill p-good">Low</span> CRUD over a small store. The only real design work is conflict handling when two people claim the same task.</p>
+    </div>
+    <div class="box"><span class="lbl">Demo shape</span>
+      <p>Two voices, one kitchen. One adds a task, the other claims it, the rollup reflects both. Simple and immediately legible.</p>
+    </div>
+  </div>
+  <div class="money"><span class="amt">$35,000</span><span class="brk">Alexa+ 1st + Open Source + AWS Builder</span></div>
+</div>
+
+<div class="prop star">
+  <div class="prop-head">
+    <h3>3 · Plainspoken</h3>
+    <span class="tag">Alexa+ MCP · accessibility</span>
+    <span class="pill p-accent">Strong differentiator</span>
+  </div>
+  <p class="pitch">A voice-first bridge that answers questions about a home's state in plain language for low-vision and blind users — turning dashboards, notifications, and status screens into things you can simply ask about.</p>
+  <div class="grid2">
+    <div class="box"><span class="lbl">Tool surface</span>
+      <ul><li><code>describe_home_state</code> — narrative, not tabular</li><li><code>whats_changed_since</code></li><li><code>explain_notification</code></li><li><code>set_priority_alerts</code></li></ul>
+    </div>
+    <div class="box"><span class="lbl">Why it wins</span>
+      <p>Accessibility is a named priority category, and it's the one where a thoughtful entrant stands out most sharply — the field is usually thin and the submissions that do appear are often superficial. Crucially, this is one of the few ideas where voice isn't a novelty layer; it's the entire access mechanism.</p>
+    </div>
+    <div class="box"><span class="lbl">Build risk</span>
+      <p><span class="pill p-warn">Medium</span> The engineering is easy; the <em>language design</em> is the hard part. Getting descriptions genuinely useful rather than verbose takes iteration.</p>
+    </div>
+    <div class="box"><span class="lbl">Demo shape</span>
+      <p>Screen off, entirely audio. Ask what's happening; get a compact, well-ordered spoken answer. The absence of visuals <em>is</em> the demo.</p>
+    </div>
+  </div>
+  <div class="money"><span class="amt">$35,000</span><span class="brk">Alexa+ 1st + Open Source + AWS Builder</span></div>
+  <div class="note" style="margin-bottom:0"><b>One caveat:</b> validate with at least one actual low-vision user before submitting. Judges in accessibility categories can reliably tell well-meaning guesswork from the real thing, and it counts against you.</div>
+</div>
+
+<div class="prop">
+  <div class="prop-head">
+    <h3>4 · Standup</h3>
+    <span class="tag">Alexa+ MCP · developer experience</span>
+  </div>
+  <p class="pitch">Ask your repo what happened. An MCP server over git history, CI status, and open PRs that answers "what broke overnight?" or "what did I leave half-finished on Friday?" conversationally.</p>
+  <div class="grid2">
+    <div class="box"><span class="lbl">Tool surface</span>
+      <ul><li><code>whats_red</code> — failing CI, summarised</li><li><code>my_open_work</code> across branches</li><li><code>summarize_changes_since</code></li><li><code>whos_blocked_on_me</code></li></ul>
+    </div>
+    <div class="box"><span class="lbl">Why it wins</span>
+      <p>"Developer experience" is an explicitly named priority, and Amazon's judges <em>are</em> developers — they feel this pain personally. Reading a CI dashboard is genuinely worse than asking a question, so the value proposition needs no explanation.</p>
+    </div>
+    <div class="box"><span class="lbl">Build risk</span>
+      <p><span class="pill p-good">Low</span> GitHub's REST API is excellent and well-documented. The work is summarisation quality, not plumbing.</p>
+    </div>
+    <div class="box"><span class="lbl">Demo shape</span>
+      <p>Monday morning, coffee in hand, no laptop open yet: "What broke over the weekend?" One spoken paragraph replaces ten minutes of dashboard archaeology.</p>
+    </div>
+  </div>
+  <div class="money"><span class="amt">$35,000</span><span class="brk">Alexa+ 1st + Open Source + AWS Builder</span></div>
+</div>
+
+<div class="prop">
+  <div class="prop-head">
+    <h3>5 · Rehearse</h3>
+    <span class="tag">Alexa+ MCP · conversational practice</span>
+  </div>
+  <p class="pitch">Practise difficult conversations out loud before they're real — giving critical feedback, declining a request, setting a boundary — with an AI counterpart that pushes back realistically, then scores you on clarity, empathy and firmness.</p>
+  <div class="grid2">
+    <div class="box"><span class="lbl">Tool surface</span>
+      <ul><li><code>start_scenario</code> from a library</li><li><code>respond_in_role</code> — the counterpart</li><li><code>score_exchange</code> on three axes</li><li><code>review_session</code> with transcript</li></ul>
+    </div>
+    <div class="box"><span class="lbl">Why it wins</span>
+      <p>Voice-native by nature — you cannot rehearse a spoken conversation by typing. The scenario library <em>is</em> the product, so quality scales with writing effort rather than engineering effort, which is the right trade for a 49-day window. Doubles as a RevenueCat Shipaton entry if you pursue both.</p>
+    </div>
+    <div class="box"><span class="lbl">Build risk</span>
+      <p><span class="pill p-warn">Medium</span> Multi-turn roleplay state is fiddlier than the others here, and inference cost per session is real — budget the Bedrock credits.</p>
+    </div>
+    <div class="box"><span class="lbl">Demo shape</span>
+      <p>Rehearse turning down extra work. The counterpart pushes back twice. Then the scorecard, with one specific line quoted back and improved.</p>
+    </div>
+  </div>
+  <div class="money"><span class="amt">$35,000</span><span class="brk">Alexa+ 1st + Open Source + AWS Builder</span></div>
+</div>
+
+<h2>If you build one thing</h2>
+<p>Build <strong>Recall</strong>. It has the lowest technical risk of the five, no external API dependency, a demo that lands inside 90 seconds, and it sits on a named priority use case. The spaced-repetition algorithm is public and small, which means nearly all your remaining time goes into polish and the write-up — and in a competition judged on the build plus the feedback, polish and the write-up <em>are</em> the score.</p>
+<p><strong>Plainspoken</strong> is the higher-variance alternative: a thinner field and a stronger story, at the cost of needing real user validation to be credible.</p>
+
+<footer>
+  Prepared 4 September 2026. Prize figures, deadlines and eligibility rules are transcribed from the published listings — verify against the official rules pages before entering, particularly country exclusions and the current Google Play closed-testing policy, which changes periodically.
+</footer>
+
+</div>

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recall — Build Tracker</title>
+<style>
+  :root{
+    --bg:#faf9f7; --surface:#ffffff; --surface-2:#f2f0ec;
+    --ink:#1c1a17; --ink-2:#55504a; --ink-3:#8a837a;
+    --line:#e3dfd8; --line-2:#cfc9bf;
+    --accent:#b4531f; --accent-soft:#fbeee5;
+    --good:#2f6b46; --good-soft:#e8f2ec;
+    --warn:#8a6410; --warn-soft:#fbf1dc;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#16150f; --surface:#1e1d17; --surface-2:#26241d;
+      --ink:#f0ece4; --ink-2:#b8b2a7; --ink-3:#8a8478;
+      --line:#332f27; --line-2:#463f34;
+      --accent:#e5904f; --accent-soft:#33231a;
+      --good:#7fc79c; --good-soft:#1a2a21;
+      --warn:#dcb45e; --warn-soft:#2b2517;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#16150f; --surface:#1e1d17; --surface-2:#26241d;
+    --ink:#f0ece4; --ink-2:#b8b2a7; --ink-3:#8a8478;
+    --line:#332f27; --line-2:#463f34;
+    --accent:#e5904f; --accent-soft:#33231a;
+    --good:#7fc79c; --good-soft:#1a2a21;
+    --warn:#dcb45e; --warn-soft:#2b2517;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:940px;margin:0 auto;padding:0 24px 96px}
+  header.top{border-bottom:1px solid var(--line);padding:56px 0 32px;margin-bottom:40px}
+  .kicker{font:600 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:16px}
+  h1{font-size:clamp(32px,5vw,48px);line-height:1.05;letter-spacing:-.025em;
+    margin:0 0 14px;font-weight:660}
+  .lede{font-size:18px;line-height:1.55;color:var(--ink-2);max-width:62ch;margin:0}
+  h2{font-size:13px;font-weight:650;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);margin:56px 0 20px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  p{margin:0 0 16px;max-width:74ch}
+  code{font:500 .88em var(--mono);background:var(--surface-2);padding:.12em .38em;
+    border-radius:4px;border:1px solid var(--line)}
+
+  .strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:0}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+  .stat .k{font:650 10.5px/1 var(--mono);letter-spacing:.11em;text-transform:uppercase;
+    color:var(--ink-3);display:block;margin-bottom:8px}
+  .stat .v{font:660 22px/1 var(--mono);color:var(--ink)}
+  .stat .v.acc{color:var(--accent)}
+  .stat .v.sm{font-size:17px}
+
+  .bar{height:10px;background:var(--surface-2);border:1px solid var(--line);
+    border-radius:20px;overflow:hidden;margin:28px 0 6px}
+  .bar i{display:block;height:100%;background:var(--accent);width:0}
+  .barlbl{font:600 12px/1 var(--mono);color:var(--ink-3);letter-spacing:.06em}
+
+  ol.stages{list-style:none;padding:0;margin:24px 0;counter-reset:st}
+  ol.stages > li{counter-increment:st;position:relative;padding:0 0 22px 46px;
+    border-left:2px solid var(--line);margin-left:13px}
+  ol.stages > li:last-child{border-left-color:transparent}
+  ol.stages > li::before{content:counter(st);position:absolute;left:-14px;top:-2px;
+    width:26px;height:26px;border-radius:50%;background:var(--line-2);color:var(--bg);
+    font:650 12px/26px var(--mono);text-align:center}
+  li.done::before{background:var(--good);color:#fff;content:"\2713"}
+  li.active::before{background:var(--accent);color:#fff}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:18px 20px}
+  li.active .card{border-color:var(--accent)}
+  li.done .card{background:var(--good-soft);border-color:var(--good)}
+  .hd{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline;margin-bottom:4px}
+  .hd h3{margin:0;font-size:18px;font-weight:640;letter-spacing:-.01em}
+  .when{font:650 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+  .goal{font-size:14.5px;color:var(--ink-2);margin:0 0 12px}
+  ul.tasks{list-style:none;padding:0;margin:0;font-size:14.5px}
+  ul.tasks li{padding:3px 0 3px 24px;position:relative;color:var(--ink-2)}
+  ul.tasks li::before{content:"\25A1";position:absolute;left:2px;color:var(--ink-3);
+    font-family:var(--mono)}
+  ul.tasks li.ok{color:var(--ink-3);text-decoration:line-through}
+  ul.tasks li.ok::before{content:"\2713";color:var(--good);text-decoration:none}
+  .exit{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line-2);
+    font-size:13.5px;color:var(--ink-3)}
+  .exit b{color:var(--ink-2);font-weight:640}
+
+  .pill{display:inline-block;font:650 10.5px/1 var(--mono);letter-spacing:.09em;
+    text-transform:uppercase;padding:5px 9px;border-radius:20px;white-space:nowrap}
+  .p-good{background:var(--good-soft);color:var(--good)}
+  .p-warn{background:var(--warn-soft);color:var(--warn)}
+  .p-accent{background:var(--accent-soft);color:var(--accent)}
+  .p-idle{background:var(--surface-2);color:var(--ink-3)}
+
+  .note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:14px 18px;
+    border-radius:0 6px 6px 0;margin:20px 0;font-size:14.5px}
+  .note b{color:var(--warn)}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:13.5px;color:var(--ink-3)}
+  @media(max-width:600px){.wrap{padding:0 18px 64px}header.top{padding-top:36px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="kicker">Build Tracker &middot; Amazon Developer Hackathon</div>
+  <h1>Recall</h1>
+  <p class="lede">Voice-native spaced repetition, exposed to Alexa+ as a self-hosted MCP server. Ten stages from an empty repo to a submitted entry. Update this file as each stage closes &mdash; it is the honest record of where the build actually is.</p>
+</header>
+
+<div class="strip">
+  <div class="stat"><span class="k">Deadline</span><span class="v sm">23 Oct 2026</span></div>
+  <div class="stat"><span class="k">Days remaining</span><span class="v acc" id="days">&mdash;</span></div>
+  <div class="stat"><span class="k">Track</span><span class="v sm">Alexa+</span></div>
+  <div class="stat"><span class="k">Stacked prizes</span><span class="v sm">$35,000</span></div>
+</div>
+
+<div class="bar"><i id="fill"></i></div>
+<div class="barlbl" id="barlbl">&mdash;</div>
+
+<h2>Stages</h2>
+
+<ol class="stages">
+
+  <li class="done">
+    <div class="card">
+      <div class="hd"><h3>Foundation</h3><span class="when">Day 0 &middot; 4 Sep</span><span class="pill p-good">Done</span></div>
+      <p class="goal">Repo, licence and the written record, before any code. The licence requirement is trivial now and easy to forget later.</p>
+      <ul class="tasks">
+        <li class="ok">Git repository initialised on <code>main</code></li>
+        <li class="ok">MIT licence at repo root</li>
+        <li class="ok">README with the pitch and run instructions</li>
+        <li class="ok">Architecture and design spec written</li>
+        <li class="ok">Friction log and product feedback files opened</li>
+        <li class="ok">Submission checklist drafted</li>
+        <li>Public GitHub repo created, licence visible in <b>About</b></li>
+      </ul>
+      <div class="exit"><b>Exit:</b> a judge could clone this and understand the intent without running anything.</div>
+    </div>
+  </li>
+
+  <li class="active">
+    <div class="card">
+      <div class="hd"><h3>Spike the risky links</h3><span class="when">Days 1&ndash;3</span><span class="pill p-accent">Current</span></div>
+      <p class="goal">Prove the two things that could invalidate the plan, while pivoting is still cheap.</p>
+      <ul class="tasks">
+        <li>Confirm what Alexa+ Preview access a hackathon entrant actually gets</li>
+        <li>Stand up a hello-world MCP server over Streamable HTTP</li>
+        <li>Connect to it from MCP Inspector and from Claude Code</li>
+        <li>Confirm Bedrock model availability and region, and make one live call</li>
+        <li>Log every surprise in <code>docs/FRICTION-LOG.md</code> as it happens</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> a real MCP client gets a real response from a locally hosted server, and one Bedrock call has returned.</div>
+    </div>
+  </li>
+
+  <li>
+    <div class="card">
+      <div class="hd"><h3>Scheduler, test-first</h3><span class="when">Days 4&ndash;8</span><span class="pill p-idle">Pending</span></div>
+      <p class="goal">SM-2 as pure functions. Correctness matters most here and is cheapest to verify here, which is why it leads.</p>
+      <ul class="tasks">
+        <li>Tests for the 0&ndash;5 quality bands, written before the implementation</li>
+        <li>Ease-factor floor and the reset-on-failure path</li>
+        <li>Multi-month interval growth verified with an injected clock</li>
+        <li><code>review()</code> implemented, all tests green</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> <code>pytest</code> passes with the algorithm exhaustively covered and no database in sight.</div>
+    </div>
+  </li>
+
+  <li>
+    <div class="card">
+      <div class="hd"><h3>Store</h3><span class="when">Days 9&ndash;13</span><span class="pill p-idle">Pending</span></div>
+      <p class="goal">SQLite, one file, cards plus an append-only review log.</p>
+      <ul class="tasks">
+        <li>Schema for <code>cards</code> and <code>reviews</code></li>
+        <li>Repository layer with integration tests against a temp database</li>
+        <li>Due-card query ordered by oldest debt first</li>
+        <li>Seeded demo deck for reproducible video runs</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> cards survive a restart, and the review log can reconstruct a streak.</div>
+    </div>
+  </li>
+
+  <li>
+    <div class="card">
+      <div class="hd"><h3>Grader on Bedrock</h3><span class="when">Days 14&ndash;22</span><span class="pill p-warn">Highest value</span></div>
+      <p class="goal">The differentiator. Server-side semantic scoring of a spoken answer, plus the calibration evidence that it is fair.</p>
+      <ul class="tasks">
+        <li>Scoring prompt returning a 0&ndash;5 quality and one spoken sentence</li>
+        <li>Calibration fixture set: answer pairs with expected score bands</li>
+        <li>Degrade safely when Bedrock is slow or unavailable &mdash; leave the schedule untouched</li>
+        <li>Empty or unintelligible transcript treated as &ldquo;no answer&rdquo;, never as wrong</li>
+        <li>Document the AWS integration in <code>docs/PRODUCT-FEEDBACK.md</code></li>
+      </ul>
+      <div class="exit"><b>Exit:</b> the calibration suite passes, and the AWS Builder mini challenge is earned in code rather than claimed.</div>
+    </div>
+  </li>
+
+  <li>
+    <div class="card">
+      <div class="hd"><h3>MCP server and speech shaping</h3><span class="when">Days 23&ndash;30</span><span class="pill p-idle">Pending</span></div>
+      <p class="goal">Four tools wired to the domain modules, with every response written to be heard rather than read.</p>
+      <ul class="tasks">
+        <li><code>list_due_cards</code>, <code>grade_response</code>, <code>add_card</code>, <code>get_streak_summary</code></li>
+        <li>Response length caps; no markup; no enumerations beyond three items</li>
+        <li>Tool descriptions legible to a model, not just to a human</li>
+        <li>End-to-end run driven from a real MCP client</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> a full review cycle completes conversationally, start to finish, through MCP.</div>
+    </div>
+  </li>
+
+  <li>
+    <div class="card">
+      <div class="hd"><h3>Browser voice harness</h3><span class="when">Days 31&ndash;36</span><span class="pill p-idle">Pending</span></div>
+      <p class="goal">Speech in and out via the Web Speech API against the same server. Insurance, usability test, and demo footage in one.</p>
+      <ul class="tasks">
+        <li><code>sim/</code> harness speaking to the MCP server</li>
+        <li>Listen to real responses and cut the verbosity you can only hear</li>
+        <li>Labelled clearly as a simulation, per the rules</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> a full review done entirely by voice, screen ignored.</div>
+    </div>
+  </li>
+
+  <li>
+    <div class="card">
+      <div class="hd"><h3>Harden and open-source PR</h3><span class="when">Days 37&ndash;41</span><span class="pill p-idle">Pending</span></div>
+      <p class="goal">Make the repo runnable by a stranger in five minutes, and earn the second mini challenge.</p>
+      <ul class="tasks">
+        <li>README verified by following it from a clean clone</li>
+        <li>One PR to a public repository, URL recorded</li>
+        <li>Licence confirmed visible in the GitHub About section</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> judges who cannot run a project fall back on the video alone &mdash; this stage removes that risk.</div>
+    </div>
+  </li>
+
+  <li>
+    <div class="card">
+      <div class="hd"><h3>Demo video</h3><span class="when">Days 42&ndash;45</span><span class="pill p-idle">Pending</span></div>
+      <p class="goal">Under three minutes, strongest thirty seconds first.</p>
+      <ul class="tasks">
+        <li>Open on the payoff: answer aloud, slightly wrong, graded on nuance, rescheduled</li>
+        <li>Architecture explained second, briefly</li>
+        <li>No third-party trademarks or licensed music</li>
+        <li>Public on YouTube or Vimeo, in English</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> the first thirty seconds alone would earn a shortlist.</div>
+    </div>
+  </li>
+
+  <li>
+    <div class="card">
+      <div class="hd"><h3>Write-up and submit</h3><span class="when">Days 46&ndash;49</span><span class="pill p-idle">Pending</span></div>
+      <p class="goal">The part most entrants rush. In a competition judged on the build plus the feedback, this is half the score.</p>
+      <ul class="tasks">
+        <li>Product feedback completed for every tool, SDK and AWS service used</li>
+        <li>Friction log tidied &mdash; severity, workaround, actionable suggestion on each entry</li>
+        <li>Tracks and mini challenges declared with their extra required fields</li>
+        <li>Submitted with days to spare, not hours</li>
+      </ul>
+      <div class="exit"><b>Exit:</b> submitted before 21 October. Never submit on deadline day.</div>
+    </div>
+  </li>
+
+</ol>
+
+<div class="note">
+  <b>Keep this file honest.</b> Mark a task <code>class="ok"</code> only when it is genuinely done, and move the <code>active</code> class as stages close. A tracker that flatters the build is worse than none &mdash; the point is to see slippage early enough to cut scope, and the scope to cut is always the demo polish, never the friction log.
+</div>
+
+<footer>
+  Recall &middot; MIT licensed &middot; Alexa+ track, stacking the AWS Builder and Open Source mini challenges.
+  Design rationale in <code>docs/superpowers/specs/2026-09-04-recall-design.md</code>.
+</footer>
+
+</div>
+
+<script>
+  (function () {
+    var start = new Date("2026-09-04T00:00:00Z");
+    var end = new Date("2026-10-23T19:00:00Z");
+    var now = new Date();
+    var day = 86400000;
+    var left = Math.max(0, Math.ceil((end - now) / day));
+    document.getElementById("days").textContent = left;
+
+    var total = (end - start) / day;
+    var gone = Math.min(Math.max((now - start) / day, 0), total);
+    var pct = Math.round((gone / total) * 100);
+    document.getElementById("fill").style.width = pct + "%";
+    document.getElementById("barlbl").textContent =
+      "Day " + Math.round(gone) + " of " + Math.round(total) + " · " + pct + "% of the window elapsed";
+  })();
+</script>
+</body>
+</html>
