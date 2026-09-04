@@ -5,4 +5,4 @@ calibration inside this repo is what makes the grading ours rather than the
 calling platform's, and is what qualifies the AWS Builder mini challenge.
 """
 
-raise_on_import = None  # placeholder module; implemented in stage 4
+__all__: list[str] = []  # implemented in stage 4

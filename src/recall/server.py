@@ -5,4 +5,4 @@ the domain modules, and shapes every response for speech - length-capped, no
 markup, no long enumerations.
 """
 
-raise_on_import = None  # placeholder module; implemented in stage 5
+__all__: list[str] = []  # implemented in stage 5

@@ -5,4 +5,4 @@ streak and retention reporting possible, and what lets grader calibration be
 evaluated retrospectively against real attempts.
 """
 
-raise_on_import = None  # placeholder module; implemented in stage 3
+__all__: list[str] = []  # implemented in stage 3
