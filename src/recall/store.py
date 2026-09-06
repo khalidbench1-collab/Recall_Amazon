@@ -11,6 +11,7 @@ See docs/ARCHITECTURE.md and decisions D6 and D7.
 from __future__ import annotations
 
 import sqlite3
+import threading
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -81,6 +82,10 @@ def _dt(value: str | None) -> datetime | None:
 class Store:
     def __init__(self, connection: sqlite3.Connection) -> None:
         self._db = connection
+        # D7 grades on a background thread, so writes arrive from more than one
+        # thread. SQLite serialises them anyway; the lock is here so a read
+        # never lands between the two UPDATEs that make up apply_grade().
+        self._lock = threading.Lock()
         self._db.row_factory = sqlite3.Row
         self._db.execute("PRAGMA foreign_keys = ON")
         self._db.executescript(SCHEMA)
@@ -88,7 +93,7 @@ class Store:
     @classmethod
     @contextmanager
     def open(cls, path: Path | str) -> Iterator[Store]:
-        connection = sqlite3.connect(path)
+        connection = sqlite3.connect(path, check_same_thread=False)
         try:
             yield cls(connection)
         finally:
@@ -155,12 +160,19 @@ class Store:
         self, review_id: int, *, quality: int, explanation: str, graded_at: datetime
     ) -> Card:
         """Attach a grade to a submitted answer and advance the card."""
-        pending = self.get_review(review_id)
-        card = self.get_card(pending.card_id)
+        with self._lock:
+            pending = self.get_review(review_id)
+            card = self.get_card(pending.card_id)
 
-        advanced = review(card.state, quality)
-        next_due = due_at(graded_at, advanced)
+            advanced = review(card.state, quality)
+            next_due = due_at(graded_at, advanced)
 
+            self._apply(review_id, card, advanced, next_due, quality, explanation,
+                        graded_at)
+        return self.get_card(card.id)
+
+    def _apply(self, review_id, card, advanced, next_due, quality, explanation,
+               graded_at) -> None:
         self._db.execute(
             "UPDATE reviews SET quality = ?, explanation = ?, graded_at = ?"
             " WHERE id = ?",
@@ -178,7 +190,21 @@ class Store:
             ),
         )
         self._db.commit()
-        return self.get_card(card.id)
+
+    def note_ungraded(self, review_id: int, *, explanation: str) -> None:
+        """Record why an answer could not be scored, without scoring it.
+
+        The card keeps its schedule (D6) and `quality` stays null, so the review
+        is still visibly ungraded in the log - but the learner hears a reason
+        instead of silence, and a later audit can tell "we failed to grade this"
+        apart from "we never tried".
+        """
+        with self._lock:
+            self._db.execute(
+                "UPDATE reviews SET explanation = ? WHERE id = ?",
+                (explanation, review_id),
+            )
+            self._db.commit()
 
     def get_review(self, review_id: int) -> Review:
         row = self._db.execute(

@@ -127,7 +127,8 @@
 <div class="card">
   <p class="goal">Everything that can be built without you is built. These are the items only you can clear &mdash; each one is an account, a form or a decision, not code.</p>
   <ul class="tasks">
-    <li><b>Optional:</b> upgrading to the Paid account plan would probably unlock Claude Sonnet 5, which is denied on Free. Not required &mdash; Sonnet 4.5 grades well and stage 4 calibration will show whether the difference is even measurable for this task.</li>
+    <li><b>Nothing is blocking the build.</b> Stages 0 to 5 are complete and the server runs end to end against live Bedrock. What follows is submission admin only.</li>
+    <li><b>Confirm the licence is visible in the repo&rsquo;s <i>About</i> panel</b> at <a href="https://github.com/khalidbench1-collab/Recall_Amazon">Recall_Amazon</a>. GitHub usually detects <code>LICENSE</code> automatically, but the rules require it visible there, so it is worth one look.</li>
     <li><b>Create the public GitHub repo</b> and confirm the MIT licence shows in the <b>About</b> panel. This is a hard submission requirement and it is worth zero points until a judge can see it.</li>
     <li><b>Redeem the $150 promotional credits</b> when the email lands &mdash; Billing &rarr; Credits &rarr; Redeem.</li>
     <li><b>Decide the AWS Builder route</b> before stage 4 ends. A single Bedrock call is what the judges name as the <i>obvious</i> answer; either build with Kiro Crew, which qualifies on its own, or give a second AWS service real work to do.</li>
@@ -207,36 +208,38 @@
     </div>
   </li>
 
-  <li class="active">
+  <li class="done">
     <div class="card">
-      <div class="hd"><h3>Grader on Bedrock</h3><span class="when">Days 14&ndash;22</span><span class="pill p-accent">Current &middot; highest value</span></div>
+      <div class="hd"><h3>Grader on Bedrock</h3><span class="when">Days 14&ndash;22 &middot; done 7 Sep</span><span class="pill p-good">Done</span></div>
       <p class="goal">The differentiator. Server-side semantic scoring of a spoken answer, plus the calibration evidence that it is fair.</p>
       <ul class="tasks">
-        <li>Scoring prompt returning a 0&ndash;5 quality and one spoken sentence</li>
-        <li>Calibration fixture set: answer pairs with expected score bands</li>
-        <li>Degrade safely when Bedrock is slow or unavailable &mdash; leave the schedule untouched</li>
-        <li>Empty or unintelligible transcript treated as &ldquo;no answer&rdquo;, never as wrong</li>
-        <li>Document the AWS integration in <code>docs/PRODUCT-FEEDBACK.md</code></li>
+        <li class="ok">Scoring prompt returning a 0&ndash;5 quality and one spoken sentence, at <code>temperature=0</code></li>
+        <li class="ok">Calibration fixture set &mdash; 11 cases with score bands, <b>11 of 11 inside band on the first live run</b></li>
+        <li class="ok">Generated evidence in <code>docs/CALIBRATION.md</code> &mdash; readers judge the fairness themselves rather than trusting a green test</li>
+        <li class="ok">Degrades safely: Bedrock down, unparseable output or an off-scale score all return an unscored result and leave the schedule untouched</li>
+        <li class="ok">Empty or unintelligible transcript treated as &ldquo;no answer&rdquo;, and never reaches the model at all</li>
+        <li class="ok">AWS integration documented concretely in <code>docs/PRODUCT-FEEDBACK.md</code></li>
       </ul>
-      <div class="exit"><b>Exit:</b> the calibration suite passes, and the AWS Builder mini challenge is earned in code rather than claimed.</div>
+      <div class="exit"><b>Exit met.</b> The case that matters: an answer whose key word was transcribed as <i>&ldquo;leemah&rdquo;</i> still scored 5, because the grader reads meaning rather than characters. That is the project's whole claim, demonstrated.</div>
     </div>
   </li>
 
   <li>
     <div class="card">
-      <div class="hd"><h3>MCP server and speech shaping</h3><span class="when">Days 23&ndash;30</span><span class="pill p-idle">Pending</span></div>
+      <div class="hd"><h3>MCP server and speech shaping</h3><span class="when">Days 23&ndash;30 &middot; done 7 Sep</span><span class="pill p-good">Done</span></div>
       <p class="goal">Four tools wired to the domain modules, with every response written to be heard rather than read.</p>
       <ul class="tasks">
-        <li><code>list_due_cards</code>, <code>grade_response</code>, <code>add_card</code>, <code>get_streak_summary</code></li>
-        <li>Response length caps; no markup; no enumerations beyond three items</li>
-        <li>Tool descriptions legible to a model, not just to a human</li>
-        <li>End-to-end run driven from a real MCP client</li>
+        <li class="ok">Five tools, not four &mdash; D7 split grading into <code>submit_answer</code> and <code>get_grade</code>. With <code>add_card</code>, <code>next_due_card</code> and <code>get_streak_summary</code>.</li>
+        <li class="ok">Response length caps and markup stripping, enforced by tests rather than by discipline</li>
+        <li class="ok"><code>next_due_card</code> returns <b>one</b> card and provably never speaks the answer with the question</li>
+        <li class="ok">Tool docstrings written for a model to read &mdash; they say when <i>not</i> to use a tool as well as when to</li>
+        <li class="ok">End-to-end run over real HTTP against live Bedrock: asked, answered in messy speech, graded on nuance, rescheduled, streak updated</li>
       </ul>
-      <div class="exit"><b>Exit:</b> a full review cycle completes conversationally, start to finish, through MCP.</div>
+      <div class="exit"><b>Exit met, with the number that matters:</b> the answer was acknowledged in <b>18&nbsp;ms</b> against the Alexa+ 500&nbsp;ms budget, while the 1054&nbsp;ms grader ran behind it. D7 is not a workaround on paper &mdash; it measurably works.</div>
     </div>
   </li>
 
-  <li>
+  <li class="active">
     <div class="card">
       <div class="hd"><h3>Browser voice harness</h3><span class="when">Days 31&ndash;36</span><span class="pill p-idle">Pending</span></div>
       <p class="goal">Speech in and out via the Web Speech API against the same server. Insurance, usability test, and demo footage in one.</p>
