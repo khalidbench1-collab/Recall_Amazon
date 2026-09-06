@@ -239,27 +239,30 @@
     </div>
   </li>
 
-  <li class="active">
+  <li class="done">
     <div class="card">
-      <div class="hd"><h3>Browser voice harness</h3><span class="when">Days 31&ndash;36</span><span class="pill p-idle">Pending</span></div>
+      <div class="hd"><h3>Browser voice harness</h3><span class="when">Days 31&ndash;36 &middot; done 7 Sep</span><span class="pill p-good">Done</span></div>
       <p class="goal">Speech in and out via the Web Speech API against the same server. Insurance, usability test, and demo footage in one.</p>
       <ul class="tasks">
-        <li><code>sim/</code> harness speaking to the MCP server</li>
-        <li>Listen to real responses and cut the verbosity you can only hear</li>
-        <li>Labelled clearly as a simulation, per the rules</li>
+        <li class="ok"><code>sim/index.html</code> speaks real MCP over Streamable HTTP &mdash; a hand-written JSON-RPC client in the browser, verified in Chrome doing a live <code>initialize</code> (200), <code>notifications/initialized</code> (202) and two <code>tools/call</code></li>
+        <li class="ok">Served from the MCP server&rsquo;s own origin at <code>/</code>, so there is no CORS to configure and no second command for a judge to run</li>
+        <li class="ok">Web Speech API for microphone and voice; an empty transcript is passed through as &ldquo;no answer&rdquo; rather than swallowed</li>
+        <li class="ok">Shows the acknowledgement time beside each answer, so the D7 split is watched rather than described</li>
+        <li class="ok">Labelled <b>SIMULATED Alexa+ experience</b> at the top per the rules, with a test asserting the label is still there</li>
+        <li><b>Needs you:</b> put headphones on and actually listen. Verbosity you can only hear is the one defect I cannot detect.</li>
       </ul>
-      <div class="exit"><b>Exit:</b> a full review done entirely by voice, screen ignored.</div>
+      <div class="exit"><b>Exit met in structure, not yet by ear.</b> The browser drives a full cycle over real MCP; whether a whole review <i>feels</i> right spoken is the part that needs a human.</div>
     </div>
   </li>
 
-  <li>
+  <li class="active">
     <div class="card">
-      <div class="hd"><h3>Harden and open-source PR</h3><span class="when">Days 37&ndash;41</span><span class="pill p-idle">Pending</span></div>
+      <div class="hd"><h3>Harden and open-source PR</h3><span class="when">Days 37&ndash;41</span><span class="pill p-accent">Current</span></div>
       <p class="goal">Make the repo runnable by a stranger in five minutes, and earn the second mini challenge.</p>
       <ul class="tasks">
-        <li>README verified by following it from a clean clone</li>
+        <li class="ok">README verified by cloning the pushed repo into an empty directory and following it literally. It worked &mdash; and it caught a tool table still advertising <code>grade_response</code>, which D7 replaced.</li>
         <li>One PR to a public repository, URL recorded</li>
-        <li>Licence confirmed visible in the GitHub About section</li>
+        <li>Licence confirmed visible in the GitHub <b>About</b> section &mdash; <b>needs you</b>, one look at the repo page</li>
       </ul>
       <div class="exit"><b>Exit:</b> judges who cannot run a project fall back on the video alone &mdash; this stage removes that risk.</div>
     </div>

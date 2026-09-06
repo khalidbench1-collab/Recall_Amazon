@@ -89,7 +89,7 @@ def create_server(service: Service) -> FastMCP:
         return service.streak_summary(now=datetime.now(UTC)).spoken
 
     @mcp.custom_route("/", methods=["GET"])
-    async def harness(request):  # noqa: ARG001
+    async def harness(request):
         """Serve the browser voice harness from the MCP server's own origin.
 
         Same origin means no CORS to configure and one command for a judge to
