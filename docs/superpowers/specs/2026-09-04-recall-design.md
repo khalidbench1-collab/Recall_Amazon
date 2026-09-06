@@ -62,6 +62,40 @@ An empty or unintelligible transcript is "no answer given", not a wrong answer. 
 card's schedule is left untouched. This is stated as a design rule because the
 tempting default — treat silence as failure — quietly corrupts the user's data.
 
+### D7 — The grading tool answers immediately and grades in the background
+*Added 6 September 2026, forced by the stage 1 spike.*
+
+Alexa+ imposes a round-trip budget of **under 500 ms** on a tool call. A Bedrock call
+takes seconds. D3 says grading is ours and server-side; the budget says a tool call
+cannot wait for it. Both hold, so the call is split:
+
+- `submit_answer` records the transcript, returns in single-digit milliseconds, and
+  starts grading in the background.
+- `get_grade` returns the verdict once it exists, and an honest "still thinking" if not.
+
+This is worse for the caller than one blocking tool and it is the only shape that fits.
+It also happens to be the right shape for speech: an assistant that says "let me think"
+and then answers is normal conversation, whereas four seconds of silence is a failure.
+
+The alternative — grading with a small fast model to fit inside 500 ms — was rejected.
+It trades the quality of the one thing that differentiates this project for conformance
+to a budget that a two-call split satisfies anyway.
+
+**Consequence:** the scheduler is unaffected (D5 keeps it pure), but the store gains a
+pending-grade state, and D6's "no answer given" path now has a sibling: "answer
+recorded, grade unavailable". Both must leave the schedule untouched.
+
+### D8 — OAuth 2.1 + PKCE is deferred to the Alexa+ connection, not built into the core
+The MCP Toolkit requires OAuth 2.1 authorization code flow with PKCE (S256), and
+explicitly does **not** support Dynamic Client Registration, OpenID Connect, or Client
+ID Metadata Documents. It also requires a public URL and a Protected Resource Metadata
+document at `/.well-known/oauth-authorization-server`.
+
+None of that is needed for MCP Inspector, Claude Code, or the browser harness — the
+three clients that actually exercise the code during the build. Auth is therefore a
+deployment concern layered on at stage 7, not a core dependency. Building it earlier
+would slow every stage in between for no verification benefit.
+
 ## The central insight
 
 SM-2 has always required a 0–5 self-assessment, collected by every existing flashcard
@@ -86,11 +120,20 @@ by a seeded demo deck and a calibration fixture set that pins expected score ban
 
 ## Open questions
 
-- Does Amazon offer a way to connect a self-hosted MCP server to a real Alexa+ account
-  during Preview? Day-one spike. Not a blocker — the browser harness covers either
-  outcome.
-- Exact Bedrock model id and region availability. To confirm against current docs
-  before `grader.py` is written.
+- ~~Does Amazon offer a way to connect a self-hosted MCP server to a real Alexa+
+  account during Preview?~~ **Resolved 6 Sep.** Yes — the Alexa+ MCP Toolkit, via the
+  `alexa-ai` CLI and an add-on. Whether Preview enrolment gates it is still unstated in
+  the docs; the browser harness makes that immaterial.
+- ~~Exact Bedrock model id and region availability.~~ **Resolved 6 Sep.**
+  `us.anthropic.claude-sonnet-5` (US geo inference profile) is correct. The bare
+  `anthropic.claude-sonnet-5` is unavailable In-Region across every US region, so the
+  profile prefix is mandatory rather than optional.
+- **New:** does the 500 ms budget apply to the whole tool call or only to the transport
+  acknowledgement? D7 is safe under either reading, so this is a question for the
+  product feedback write-up, not a blocker.
+- **New, and the only live blocker:** no AWS credentials are configured on this
+  machine, so the live Bedrock call in `spike/check_bedrock.py` has not been run. Needed
+  before stage 4.
 
 ## Next step
 

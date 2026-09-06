@@ -71,17 +71,23 @@ calibration are all ours and all testable.
 1. Alexa+ calls `list_due_cards`. Store returns cards where `due_at <= now`, oldest
    debt first.
 2. Alexa+ speaks a prompt. The user answers aloud; Alexa+ transcribes.
-3. Alexa+ calls `grade_response` with the card id and the transcript.
-4. `grader.py` asks Bedrock for a 0–5 score and a one-line explanation.
+3. Alexa+ calls `submit_answer` with the card id and the transcript. It records the
+   attempt, kicks off grading, and returns immediately — see decision D7. Alexa+ has a
+   round-trip budget of under 500 ms, which a model call cannot meet.
+4. In the background, `grader.py` asks Bedrock for a 0–5 score and a one-line
+   explanation.
 5. `scheduler.py` computes the next interval from that score.
 6. `store.py` writes the new card state and appends to the review log.
-7. The tool returns the explanation, shaped for speech.
+7. Alexa+ calls `get_grade`, which returns the explanation shaped for speech — or an
+   honest "still thinking" if grading has not landed yet.
 
 ## Error handling
 
 Three failure classes, handled differently:
 
-- **Bedrock unavailable or slow.** Grading is the only network dependency. On failure
+- **Bedrock unavailable or slow.** Grading is the only network dependency. Slowness is
+  now expected rather than exceptional, which is why it is handled by the two-call split
+  above rather than by a timeout. On outright failure
   the tool returns a graded-as-unknown result that leaves the card's schedule
   untouched rather than corrupting it with a guess, and says so aloud. A silently
   mis-scheduled card is worse than a skipped review.
