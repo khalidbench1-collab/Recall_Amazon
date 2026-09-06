@@ -103,3 +103,33 @@ Copy this block for each entry.
 - **Workaround:** Always use the `us.` geo profile. `.env.example` already does.
 - **Actionable suggestion:** Generate the sample code from the availability table
   rather than from a template, so the two cannot drift apart.
+
+### The Bedrock console hides the "Model access" page, and account verification is invisible until the first API call
+- **Tool / SDK:** Amazon Bedrock console, new AWS account
+- **Date:** 2026-09-06
+- **Task attempted:** Get a brand-new AWS account to the point of making one Bedrock
+  call.
+- **Steps taken:** Created the account, enabled MFA, switched to `us-east-1`, went
+  looking for the documented **Model access** page in the Bedrock console, then found
+  Claude Sonnet 5 through **Model catalog** instead, submitted the Anthropic use-case
+  form, created a Bedrock API key, and called `converse()`.
+- **Expected:** Either a response, or a clear statement in the console of what was
+  still outstanding.
+- **Actually happened:** Two separate surprises. First, the widely documented
+  standalone "Model access" sidebar entry no longer exists — access is now negotiated
+  per model inside the Model catalog. Every guide, including AWS's own, still describes
+  the old path, so a newcomer's first act is hunting for a page that is not there.
+  Second, and more costly: the call failed with
+  `AccessDeniedException: Your account is currently being verified. Verification
+  normally takes less than 2 hours.` Nothing anywhere in the console — not the Bedrock
+  overview, not the model page, not the account settings — indicated that the account
+  was in a pending state. The only way to discover it is to write working code and have
+  it rejected.
+- **Severity:** major — it is indistinguishable, at the point of failure, from a
+  mistake in your own credentials, region, or model id.
+- **Workaround:** Wait. The request shape was already correct.
+- **Actionable suggestion:** Two things. Surface pending account verification as a
+  banner in the console, the way the Anthropic use-case requirement already is — the
+  information clearly exists, it is simply not shown where the user is looking. And
+  when the old **Model access** page is removed, redirect it rather than deleting it,
+  so the years of existing documentation and tutorials still land somewhere useful.
