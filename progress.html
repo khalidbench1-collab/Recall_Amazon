@@ -123,6 +123,19 @@
 <div class="bar"><i id="fill"></i></div>
 <div class="barlbl" id="barlbl">&mdash;</div>
 
+<h2>Waiting on you</h2>
+<div class="card">
+  <p class="goal">Everything that can be built without you is built. These are the items only you can clear &mdash; each one is an account, a form or a decision, not code.</p>
+  <ul class="tasks">
+    <li><b>Retry the Bedrock call</b> once AWS finishes verifying the account (up to two hours from creation). Run <code>./.venv/Scripts/python.exe spike/check_bedrock.py</code> &mdash; a printed <code>ready</code> closes stage 1 and unblocks stage 4.</li>
+    <li><b>Create the public GitHub repo</b> and confirm the MIT licence shows in the <b>About</b> panel. This is a hard submission requirement and it is worth zero points until a judge can see it.</li>
+    <li><b>Redeem the $150 promotional credits</b> when the email lands &mdash; Billing &rarr; Credits &rarr; Redeem.</li>
+    <li><b>Decide the AWS Builder route</b> before stage 4 ends. A single Bedrock call is what the judges name as the <i>obvious</i> answer; either build with Kiro Crew, which qualifies on its own, or give a second AWS service real work to do.</li>
+  </ul>
+  <div class="exit"><b>Not blocking:</b> stage 4 can start without any of these. The grader prompt, the calibration fixture set and its scoring bands are all written and tested against recorded answers before a live model is ever called.</div>
+</div>
+
+
 <h2>Stages</h2>
 
 <ol class="stages">
@@ -149,14 +162,14 @@
 
   <li class="active">
     <div class="card">
-      <div class="hd"><h3>Spike the risky links</h3><span class="when">Days 1&ndash;3 &middot; 6 Sep</span><span class="pill p-accent">Current</span></div>
+      <div class="hd"><h3>Spike the risky links</h3><span class="when">Days 1&ndash;3 &middot; 6 Sep</span><span class="pill p-warn">Blocked on AWS</span></div>
       <p class="goal">Prove the two things that could invalidate the plan, while pivoting is still cheap.</p>
       <ul class="tasks">
         <li class="ok">Confirm what Alexa+ Preview access a hackathon entrant actually gets &mdash; the <b>MCP Toolkit</b> is the documented path</li>
         <li class="ok">Stand up a hello-world MCP server over Streamable HTTP &mdash; <code>spike/hello_mcp.py</code></li>
         <li class="ok">Connect from a real MCP client &mdash; <code>fastmcp.Client</code> and raw <code>curl</code> both handshake at <b>protocol 2025-11-25</b>; <code>.mcp.json</code> registers it for Claude Code</li>
         <li class="ok">Confirm Bedrock model availability and region &mdash; <code>us.anthropic.claude-sonnet-5</code>, geo profile mandatory</li>
-        <li>Make one live Bedrock call &mdash; <b>blocked:</b> no AWS credentials on this machine (<code>spike/check_bedrock.py</code> is written and waiting)</li>
+        <li>Make one live Bedrock call &mdash; <b>blocked on AWS, not on us.</b> Account created, Bedrock API key issued and configured, Anthropic use-case form submitted. The call authenticates and reaches Bedrock, then returns <code>AccessDeniedException: Your account is currently being verified</code>. Nothing to fix; retry after the two-hour window.</li>
         <li class="ok">Log every surprise in <code>docs/FRICTION-LOG.md</code> &mdash; four entries, two of them major</li>
       </ul>
       <div class="exit"><b>Exit:</b> a real MCP client gets a real response from a locally hosted server, and one Bedrock call has returned. <b>Half met.</b> The MCP half is proven end to end; the Bedrock half waits on credentials. The spike also cost the plan a new decision &mdash; Alexa+ enforces a sub-500&nbsp;ms tool round trip, so grading had to be split into two calls (D7).</div>
@@ -165,35 +178,38 @@
 
   <li>
     <div class="card">
-      <div class="hd"><h3>Scheduler, test-first</h3><span class="when">Days 4&ndash;8</span><span class="pill p-idle">Pending</span></div>
+      <div class="hd"><h3>Scheduler, test-first</h3><span class="when">Days 4&ndash;8 &middot; done 6 Sep</span><span class="pill p-good">Done</span></div>
       <p class="goal">SM-2 as pure functions. Correctness matters most here and is cheapest to verify here, which is why it leads.</p>
       <ul class="tasks">
-        <li>Tests for the 0&ndash;5 quality bands, written before the implementation</li>
-        <li>Ease-factor floor and the reset-on-failure path</li>
-        <li>Multi-month interval growth verified with an injected clock</li>
-        <li><code>review()</code> implemented, all tests green</li>
+        <li class="ok">Tests for the 0&ndash;5 quality bands, written before the implementation and watched fail first</li>
+        <li class="ok">Ease-factor floor and the reset-on-failure path</li>
+        <li class="ok"><b>Graded lapse</b> &mdash; a 2 keeps 30% of the interval and its repetition history; 0 and 1 still reset. The 0&ndash;5 signal earning its keep twice.</li>
+        <li class="ok">Multi-month growth verified with an injected clock &mdash; intervals cross a year in ten perfect reviews, and a failing card never drifts past a week</li>
+        <li class="ok"><code>review()</code> and <code>due_at()</code> implemented, <b>23 tests green</b></li>
       </ul>
-      <div class="exit"><b>Exit:</b> <code>pytest</code> passes with the algorithm exhaustively covered and no database in sight.</div>
+      <div class="exit"><b>Exit met.</b> <code>pytest</code> passes with no database and no wall clock anywhere in the suite.</div>
     </div>
   </li>
 
   <li>
     <div class="card">
-      <div class="hd"><h3>Store</h3><span class="when">Days 9&ndash;13</span><span class="pill p-idle">Pending</span></div>
+      <div class="hd"><h3>Store</h3><span class="when">Days 9&ndash;13 &middot; done 6 Sep</span><span class="pill p-good">Done</span></div>
       <p class="goal">SQLite, one file, cards plus an append-only review log.</p>
       <ul class="tasks">
-        <li>Schema for <code>cards</code> and <code>reviews</code></li>
-        <li>Repository layer with integration tests against a temp database</li>
-        <li>Due-card query ordered by oldest debt first</li>
-        <li>Seeded demo deck for reproducible video runs</li>
+        <li class="ok">Schema for <code>cards</code> and <code>reviews</code>, with a pending-grade state for D7</li>
+        <li class="ok">Repository layer, integration-tested against real SQLite in a temp file &mdash; no mocks</li>
+        <li class="ok">Due-card query ordered by oldest debt first, with a session cap</li>
+        <li class="ok"><code>submit_answer()</code> provably leaves the schedule untouched until a grade lands (D6, D7)</li>
+        <li class="ok">Streak reconstruction from the review log, counting graded reviews only</li>
+        <li class="ok">Seeded demo deck &mdash; eight cards, idempotent so a second take does not double the pile</li>
       </ul>
-      <div class="exit"><b>Exit:</b> cards survive a restart, and the review log can reconstruct a streak.</div>
+      <div class="exit"><b>Exit met.</b> Cards survive a restart and the log reconstructs a streak. <b>41 tests green, lint clean.</b></div>
     </div>
   </li>
 
-  <li>
+  <li class="active">
     <div class="card">
-      <div class="hd"><h3>Grader on Bedrock</h3><span class="when">Days 14&ndash;22</span><span class="pill p-warn">Highest value</span></div>
+      <div class="hd"><h3>Grader on Bedrock</h3><span class="when">Days 14&ndash;22</span><span class="pill p-accent">Current &middot; highest value</span></div>
       <p class="goal">The differentiator. Server-side semantic scoring of a spoken answer, plus the calibration evidence that it is fair.</p>
       <ul class="tasks">
         <li>Scoring prompt returning a 0&ndash;5 quality and one spoken sentence</li>
