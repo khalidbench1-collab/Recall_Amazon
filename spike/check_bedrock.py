@@ -7,27 +7,10 @@ fail. `us.` (or `global.`) is required.
 """
 
 import os
-from pathlib import Path
 
 import boto3
 
-
-def load_env(path: Path = Path(".env")) -> None:
-    """Read KEY=VALUE lines from .env into the environment.
-
-    Hand-rolled rather than pulling in python-dotenv: six lines is cheaper than
-    a dependency for a spike, and it keeps the secret in a gitignored file
-    instead of a shell command that would land in shell history.
-    """
-    if not path.exists():
-        return
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
-
+from recall.config import load_env
 
 load_env()
 
