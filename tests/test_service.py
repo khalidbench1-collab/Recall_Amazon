@@ -152,3 +152,19 @@ class TestStreak:
         for i in range(3):
             service.add_card(f"q{i}", "a", now=NOW - timedelta(days=1))
         assert "3" in service.streak_summary(now=NOW).spoken
+
+
+class TestCredentialDetection:
+    """A judge running this in November will have no AWS account of their own."""
+
+    def test_a_bedrock_api_key_counts_as_credentials(self, monkeypatch) -> None:
+        from recall.config import bedrock_credentials_present
+
+        monkeypatch.setenv("AWS_BEARER_TOKEN_BEDROCK", "abc")
+        assert bedrock_credentials_present()
+
+    def test_the_notice_says_what_still_works_and_how_to_fix_it(self) -> None:
+        from recall.config import NO_CREDENTIALS_NOTICE
+
+        assert "never changes a card's schedule" in NO_CREDENTIALS_NOTICE
+        assert "AWS_BEARER_TOKEN_BEDROCK" in NO_CREDENTIALS_NOTICE

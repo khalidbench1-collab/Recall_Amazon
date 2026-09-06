@@ -21,7 +21,7 @@ from datetime import UTC, datetime
 
 from fastmcp import FastMCP
 
-from recall.config import load_env
+from recall.config import NO_CREDENTIALS_NOTICE, bedrock_credentials_present, load_env
 from recall.service import Service
 from recall.store import Store
 
@@ -91,6 +91,10 @@ def create_server(service: Service) -> FastMCP:
 
 def main() -> None:  # pragma: no cover - process entry point
     load_env()
+
+    if not bedrock_credentials_present():
+        print(NO_CREDENTIALS_NOTICE, flush=True)
+        print(flush=True)
     db_path = os.environ.get("RECALL_DB_PATH", "./recall.db")
     host = os.environ.get("RECALL_HOST", "0.0.0.0")
     port = int(os.environ.get("RECALL_PORT", "8080"))
