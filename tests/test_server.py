@@ -75,3 +75,26 @@ class TestFullReviewCycle:
     async def test_the_streak_is_reportable_over_mcp(self, mcp) -> None:
         async with Client(mcp) as client:
             assert await call(client, "get_streak_summary")
+
+
+class TestHarness:
+    """The browser harness is the hackathon's sanctioned simulated experience,
+    so it has to actually be served - and labelled as simulated."""
+
+    async def test_the_harness_is_served_from_the_server_root(self, mcp) -> None:
+        from starlette.testclient import TestClient
+
+        response = TestClient(mcp.http_app()).get("/")
+        assert response.status_code == 200
+
+    async def test_the_harness_declares_itself_a_simulation(self, mcp) -> None:
+        from starlette.testclient import TestClient
+
+        body = TestClient(mcp.http_app()).get("/").text
+        assert "SIMULATED" in body
+
+    async def test_the_harness_talks_to_the_real_mcp_endpoint(self, mcp) -> None:
+        from starlette.testclient import TestClient
+
+        body = TestClient(mcp.http_app()).get("/").text
+        assert '"/mcp"' in body and "tools/call" in body

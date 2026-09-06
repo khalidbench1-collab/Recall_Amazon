@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recall — simulated Alexa+ experience</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --line:#262b36; --ink:#e8eaf0;
+    --dim:#98a0b3; --accent:#5cc8ff; --good:#5fd39a; --warn:#ffb454; --bad:#ff7a7a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;
+    display:flex;justify-content:center;padding:24px}
+  main{width:100%;max-width:760px}
+  .sim{background:#3a2a12;border:1px solid #6b4d1c;color:#ffd79a;
+    padding:10px 14px;border-radius:8px;font-size:14px;margin-bottom:18px}
+  .sim b{color:#ffce78}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--dim);font-size:14px;margin:0 0 20px}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+  button{font:inherit;font-weight:600;padding:11px 18px;border-radius:9px;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+  button:hover:not(:disabled){border-color:var(--accent)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  button.primary{background:var(--accent);color:#04202e;border-color:var(--accent)}
+  .status{color:var(--dim);font-size:14px;margin-left:auto}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+    background:var(--dim);margin-right:6px;vertical-align:middle}
+  .dot.live{background:var(--bad);animation:pulse 1.1s infinite}
+  .dot.busy{background:var(--warn)}
+  .dot.ok{background:var(--good)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  #log{display:flex;flex-direction:column;gap:10px}
+  .turn{padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel);white-space:pre-wrap}
+  .turn.you{background:#1b2330;border-color:#2c3b52}
+  .turn .who{font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--dim);margin-bottom:5px}
+  .turn.you .who{color:var(--accent)}
+  .meta{font-size:12px;color:var(--dim);margin-top:6px}
+  .q{font-size:12px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px}
+  .q5,.q4{background:#123d2b;color:var(--good)}
+  .q3,.q2{background:#3d3312;color:var(--warn)}
+  .q1,.q0{background:#3d1a1a;color:var(--bad)}
+  .qnone{background:#2a2f3a;color:var(--dim)}
+  footer{margin-top:26px;color:var(--dim);font-size:13px;
+    border-top:1px solid var(--line);padding-top:14px}
+  code{background:#1d2230;padding:1px 5px;border-radius:4px;font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <div class="sim">
+    <b>SIMULATED Alexa+ experience.</b> This is a browser harness, not an Alexa device.
+    It uses the Web Speech API for microphone and voice, and speaks to the same
+    <b>MCP server over Streamable HTTP</b> that Alexa+ would — identical protocol,
+    identical tools, identical code path.
+  </div>
+
+  <h1>Recall</h1>
+  <p class="sub">Answer out loud. You are graded on meaning, not wording.</p>
+
+  <div class="bar">
+    <button id="start" class="primary">Start review</button>
+    <button id="talk" disabled>Hold to answer</button>
+    <button id="skip" disabled>Next card</button>
+    <span class="status"><span id="dot" class="dot"></span><span id="status">idle</span></span>
+  </div>
+
+  <div id="log"></div>
+
+  <footer>
+    Tools called live: <code>get_streak_summary</code>, <code>next_due_card</code>,
+    <code>submit_answer</code>, <code>get_grade</code>.
+    Grading runs after the answer is acknowledged, so nothing waits on the model.
+  </footer>
+</main>
+
+<script>
+/* ---------- a minimal MCP client over Streamable HTTP ---------- */
+const MCP = {
+  url: new URL("/mcp", location.origin).href,
+  session: null,
+  id: 0,
+
+  async rpc(method, params) {
+    const headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json, text/event-stream",
+    };
+    if (this.session) headers["Mcp-Session-Id"] = this.session;
+
+    const res = await fetch(this.url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ jsonrpc: "2.0", id: ++this.id, method, params }),
+    });
+
+    const sid = res.headers.get("Mcp-Session-Id");
+    if (sid) this.session = sid;
+    if (res.status === 202) return null;              // notification accepted
+
+    const body = await res.text();
+    // The response may be JSON or an SSE stream; take the last data: line.
+    let payload = body;
+    if (body.startsWith("event:") || body.includes("\ndata:")) {
+      const lines = body.split("\n").filter(l => l.startsWith("data:"));
+      payload = lines.length ? lines[lines.length - 1].slice(5).trim() : "{}";
+    }
+    const msg = JSON.parse(payload);
+    if (msg.error) throw new Error(msg.error.message || "MCP error");
+    return msg.result;
+  },
+
+  async notify(method, params) {
+    const headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json, text/event-stream",
+    };
+    if (this.session) headers["Mcp-Session-Id"] = this.session;
+    await fetch(this.url, {
+      method: "POST", headers,
+      body: JSON.stringify({ jsonrpc: "2.0", method, params }),
+    });
+  },
+
+  async connect() {
+    await this.rpc("initialize", {
+      protocolVersion: "2025-11-25",
+      capabilities: {},
+      clientInfo: { name: "recall-browser-harness", version: "1.0" },
+    });
+    await this.notify("notifications/initialized", {});
+  },
+
+  async call(name, args) {
+    const r = await this.rpc("tools/call", { name, arguments: args || {} });
+    const first = (r.content || []).find(c => c.type === "text");
+    return first ? first.text : "";
+  },
+};
+
+/* ---------- speech ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function say(text) {
+  return new Promise(resolve => {
+    if (!window.speechSynthesis) return resolve();
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.02;
+    u.onend = resolve;
+    u.onerror = resolve;
+    speechSynthesis.speak(u);
+  });
+}
+
+function listen() {
+  return new Promise(resolve => {
+    if (!SR) return resolve("");
+    const rec = new SR();
+    rec.lang = "en-US";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    let done = false;
+    const finish = v => { if (!done) { done = true; resolve(v); } };
+    rec.onresult = e => finish(e.results[0][0].transcript);
+    // An empty transcript is not an error here - the server treats it as
+    // "no answer given", which deliberately does not count as a wrong answer.
+    rec.onerror = () => finish("");
+    rec.onend = () => finish("");
+    rec.start();
+    window.__rec = rec;
+  });
+}
+
+/* ---------- ui ---------- */
+const logEl = document.getElementById("log");
+const statusEl = document.getElementById("status");
+const dotEl = document.getElementById("dot");
+const startBtn = document.getElementById("start");
+const talkBtn = document.getElementById("talk");
+const skipBtn = document.getElementById("skip");
+
+function status(text, kind) {
+  statusEl.textContent = text;
+  dotEl.className = "dot" + (kind ? " " + kind : "");
+}
+
+function turn(who, text, cls) {
+  const el = document.createElement("div");
+  el.className = "turn" + (cls ? " " + cls : "");
+  el.innerHTML = `<div class="who"></div><div class="body"></div>`;
+  el.querySelector(".who").textContent = who;
+  el.querySelector(".body").textContent = text;
+  logEl.appendChild(el);
+  el.scrollIntoView({ behavior: "smooth", block: "end" });
+  return el;
+}
+
+function badge(el, quality) {
+  const b = document.createElement("span");
+  const known = quality !== null && quality !== undefined;
+  b.className = "q " + (known ? "q" + quality : "qnone");
+  b.textContent = known ? quality + " / 5" : "not graded";
+  el.querySelector(".who").appendChild(b);
+}
+
+/* ---------- the review loop ---------- */
+let currentCard = null;
+let busy = false;
+
+function parseTrailing(text, word) {
+  const m = new RegExp(word + " (\\d+)").exec(text);
+  return m ? parseInt(m[1], 10) : null;
+}
+function stripTrailing(text) {
+  return text.replace(/\s*\((card|review) \d+\)\s*$/, "");
+}
+
+async function askNext() {
+  const raw = await MCP.call("next_due_card");
+  currentCard = parseTrailing(raw, "card");
+  const spoken = stripTrailing(raw);
+  turn("Recall", spoken);
+  await say(spoken);
+
+  const hasCard = currentCard !== null;
+  talkBtn.disabled = !hasCard;
+  skipBtn.disabled = !hasCard;
+  status(hasCard ? "your turn" : "nothing due", hasCard ? "ok" : "");
+}
+
+async function answer() {
+  if (busy || currentCard === null) return;
+  busy = true;
+  talkBtn.disabled = skipBtn.disabled = true;
+
+  status("listening", "live");
+  const transcript = await listen();
+  turn("You", transcript || "(nothing heard)", "you");
+
+  status("sending", "busy");
+  const t0 = performance.now();
+  const ack = await MCP.call("submit_answer", {
+    card_id: currentCard, transcript: transcript,
+  });
+  const ms = Math.round(performance.now() - t0);
+  const reviewId = parseTrailing(ack, "review");
+
+  const ackEl = turn("Recall", stripTrailing(ack));
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.textContent = `acknowledged in ${ms} ms — grading continues in the background`;
+  ackEl.appendChild(meta);
+  await say(stripTrailing(ack));
+
+  status("grading", "busy");
+  let verdict = "";
+  for (let i = 0; i < 20; i++) {
+    verdict = await MCP.call("get_grade", { review_id: reviewId });
+    if (!/still thinking/i.test(verdict)) break;
+    await new Promise(r => setTimeout(r, 700));
+  }
+
+  const vEl = turn("Recall", verdict);
+  badge(vEl, null);
+  await say(verdict);
+
+  const streak = await MCP.call("get_streak_summary");
+  const s = document.createElement("div");
+  s.className = "meta";
+  s.textContent = streak;
+  vEl.appendChild(s);
+
+  busy = false;
+  await askNext();
+}
+
+startBtn.addEventListener("click", async () => {
+  startBtn.disabled = true;
+  try {
+    status("connecting", "busy");
+    await MCP.connect();
+    const streak = await MCP.call("get_streak_summary");
+    turn("Recall", streak);
+    await say(streak);
+    await askNext();
+  } catch (e) {
+    status("error", "");
+    turn("Recall", "Could not reach the MCP server: " + e.message);
+    startBtn.disabled = false;
+  }
+});
+
+talkBtn.addEventListener("click", answer);
+skipBtn.addEventListener("click", async () => {
+  if (busy) return;
+  await askNext();
+});
+
+if (!SR) {
+  turn("Recall",
+    "This browser has no Web Speech API. Chrome or Edge is needed for the " +
+    "microphone. Everything else on this page still works.");
+}
+</script>
+</body>
+</html>

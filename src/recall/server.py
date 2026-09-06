@@ -18,8 +18,10 @@ from __future__ import annotations
 
 import os
 from datetime import UTC, datetime
+from pathlib import Path
 
 from fastmcp import FastMCP
+from starlette.responses import HTMLResponse, PlainTextResponse
 
 from recall.config import NO_CREDENTIALS_NOTICE, bedrock_credentials_present, load_env
 from recall.service import Service
@@ -85,6 +87,20 @@ def create_server(service: Service) -> FastMCP:
         Use when the user asks how they are getting on, or to open a session.
         """
         return service.streak_summary(now=datetime.now(UTC)).spoken
+
+    @mcp.custom_route("/", methods=["GET"])
+    async def harness(request):  # noqa: ARG001
+        """Serve the browser voice harness from the MCP server's own origin.
+
+        Same origin means no CORS to configure and one command for a judge to
+        run - and, more usefully, it means the page in the browser is talking
+        to the identical endpoint Alexa+ would, rather than a demo backend
+        wearing the same name.
+        """
+        page = Path(__file__).resolve().parents[2] / "sim" / "index.html"
+        if not page.exists():
+            return PlainTextResponse("sim/index.html not found", status_code=404)
+        return HTMLResponse(page.read_text(encoding="utf-8"))
 
     return mcp
 
