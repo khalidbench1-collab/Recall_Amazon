@@ -115,6 +115,22 @@ criteria (Quality of Idea, Potential Impact) are differentiation scores. The mit
 is D3 and the insight above: the differentiator must be visibly *ours* in the code and
 audible in the demo, not asserted in the README.
 
+**Substantially reduced on 6 September**, on reading the full rules. The judging
+criteria publish worked examples of obvious versus creative per track, and for Alexa+
+*creative* explicitly includes "context-aware add-on that maintains state across
+sessions". That is a description of a spaced-repetition server rather than a category
+it happens to fall into — the state held between sessions is the product. The framing
+in the write-up should borrow the judges' words.
+
+The field is also larger than the strategy doc assumed: **2,479 entrants**, not 1,263.
+
+**A new risk in its place, and it lands on the mini challenge.** The same section
+defines *obvious* AWS Builder work as "a single Bedrock call for text generation",
+which is exactly what `grader.py` is designed to be. The Alexa+ track prize is
+unaffected; the $5,000 AWS Builder prize is not. The rules offer two independent exits
+— Kiro Crew qualifies on its own with no runtime AWS service, or a second AWS service
+with real work to do — and this must be decided by stage 4, not in October.
+
 Second risk: Bedrock grading is non-deterministic, and the demo is recorded. Mitigated
 by a seeded demo deck and a calibration fixture set that pins expected score bands.
 
