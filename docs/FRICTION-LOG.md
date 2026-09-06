@@ -133,3 +133,52 @@ Copy this block for each entry.
   information clearly exists, it is simply not shown where the user is looking. And
   when the old **Model access** page is removed, redirect it rather than deleting it,
   so the years of existing documentation and tutorials still land somewhere useful.
+
+### Claude Sonnet 5 is listed in the model catalogue but cannot be invoked, and the error will not say why
+- **Tool / SDK:** Amazon Bedrock, Free plan account
+- **Date:** 2026-09-06
+- **Task attempted:** Make the first live grading call with
+  `us.anthropic.claude-sonnet-5`.
+- **Steps taken:** Waited out account verification, then called `converse()`. When it
+  failed, called `ListFoundationModels` to see what the account could actually reach,
+  then probed five model ids directly.
+- **Expected:** Either a response, or an error explaining what to do about it.
+- **Actually happened:** `AccessDeniedException: anthropic.claude-sonnet-5 is not
+  available for this account. You can explore other available models on Amazon Bedrock.
+  For additional access options, contact AWS Sales.` The model is nonetheless returned
+  by `ListFoundationModels`, so the catalogue and the runtime disagree. The message
+  names no cause and offers no self-service remedy - "contact AWS Sales" is not an
+  action a hackathon entrant can take at 11pm. Probing established what the message
+  would not: Haiku 4.5 and Sonnet 4.5 both invoke fine on the same account with the
+  same key, so it is neither the credentials, nor the region, nor Anthropic access in
+  general, nor the use-case form. It is this one model.
+- **Severity:** major - three separate hypotheses (bad key, pending use-case form,
+  Free plan restriction) all fit the message equally well, and only direct probing
+  distinguishes them.
+- **Workaround:** Use `us.anthropic.claude-sonnet-4-5-20250929-v1:0`, which works.
+- **Actionable suggestion:** Say the reason in the error, and say the remedy. "This
+  model requires a Paid account plan" or "requires Marketplace subscription X" turns a
+  thirty-minute investigation into a one-click fix. Failing that, exclude models the
+  account cannot invoke from `ListFoundationModels`, so the catalogue stops promising
+  what the runtime refuses.
+
+### Every Bedrock model exceeds the Alexa+ 500 ms tool budget, including the smallest
+- **Tool / SDK:** Amazon Bedrock + Alexa+ MCP Toolkit
+- **Date:** 2026-09-06
+- **Task attempted:** Measure real round-trip latency against the Alexa+ requirement of
+  "less than 500 ms".
+- **Steps taken:** Called `converse()` with a sixteen-token cap - about as small as a
+  request gets - across four models in `us-east-1`.
+- **Expected:** That a small, fast model might fit inside the budget.
+- **Actually happened:** Nothing came close. Nova Lite 557 ms, Haiku 4.5 956 ms,
+  Sonnet 4.5 1510 ms, and 1771 ms on a repeat call. Amazon's own smallest and cheapest
+  model misses Amazon's own latency requirement by 11% on a trivial prompt, before any
+  real prompt, retry or cold start.
+- **Severity:** major - taken literally, the requirement excludes every model the AWS
+  Builder mini challenge exists to encourage.
+- **Workaround:** Decision D7 - the tool acknowledges immediately and grades in the
+  background, so no single call ever waits on inference.
+- **Actionable suggestion:** Either scope the 500 ms budget to the transport
+  acknowledgement rather than the whole tool call, or document the async pattern as the
+  supported approach for model-backed tools. Right now the two halves of the same
+  hackathon point in opposite directions.
