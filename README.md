@@ -125,7 +125,6 @@ so any MCP client drives it:
 | [`docs/FRICTION-LOG.md`](docs/FRICTION-LOG.md) | Live friction log (worth up to a 10% judging bonus) |
 | [`docs/PRODUCT-FEEDBACK.md`](docs/PRODUCT-FEEDBACK.md) | Required per-SDK product feedback, written as we go |
 | [`docs/CALIBRATION.md`](docs/CALIBRATION.md) | Grader calibration against the live model - generated, not written |
-| [`Assets/hackathon-strategy.html`](Assets/hackathon-strategy.html) | The strategy analysis this project came out of |
 
 ## Licence
 
