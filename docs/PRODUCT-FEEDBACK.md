@@ -82,5 +82,28 @@ friction log: fresh impressions are specific, remembered ones are generic.
 - **Would build with it again:** Yes. The onboarding cost us an afternoon; the API
   itself cost us nothing and the grading quality is the reason the project works.
 
-## Alexa+ developer tooling
-_Pending._
+## Alexa+ developer tooling (MCP Toolkit documentation)
+- **Used for:** Establishing what a self-hosted MCP server must satisfy to connect to
+  Alexa+, and deciding the architecture from that.
+- **Onboarding:** The quickstart is clear about mechanics - `alexa-ai configure`,
+  `alexa-ai deploy`, an add-on manifest - but never states whether Preview enrolment is
+  a precondition, which is the single question a new entrant arrives with. Preview-gated
+  products should state their gate before their prerequisites, because it is the only
+  prerequisite a reader cannot fix by reading further.
+- **Worked well:** The requirements are specific and testable rather than vague, which
+  is rarer than it should be: a named spec version (2025-11-25), a named transport
+  (Streamable HTTP), a named auth flow (OAuth 2.1 authorization code with PKCE S256),
+  and an explicit list of what is *not* supported (DCR, OIDC, CIMD). That list saved
+  real time - knowing what is unsupported is worth more than knowing what is.
+- **Needs work:** The **500 ms round-trip budget** is the significant one, and it is
+  stated as a flat number with no guidance for tools whose work is genuinely slower. We
+  measured every plausible Bedrock model on a sixteen-token prompt and all of them miss
+  it, Amazon's own Nova Lite included at 557 ms. Taken literally the requirement
+  excludes every AI-backed add-on, which is the category the toolkit exists to enable
+  and the AWS Builder mini challenge exists to encourage. The MCP spec has progress
+  notifications for exactly this situation and the docs do not mention them. We resolved
+  it architecturally - acknowledge in 18 ms, grade in the background - but that was our
+  inference, not documented guidance, and every entrant will have to rediscover it.
+- **Would build with it again:** Yes. The protocol choice is right, and being
+  client-agnostic meant no hardware was ever needed. The latency budget needs either
+  scoping to the transport acknowledgement or a documented pattern for slow tools.
