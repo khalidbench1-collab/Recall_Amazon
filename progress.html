@@ -126,11 +126,11 @@
 
 <h2>Waiting on you</h2>
 <div class="card">
-  <p class="goal">Stages 0 to 6 are complete and the whole thing runs end to end against live Bedrock. Nothing below blocks any remaining build work &mdash; these are the things that need a human, a decision, or a voice.</p>
+  <p class="goal">Every build stage is complete and the whole thing runs end to end against live Bedrock. Nothing below blocks any remaining build work &mdash; these are the things that need a human, a decision, or a voice.</p>
   <ul class="tasks">
     <li><b>Record the demo video.</b> Script is timed to the second in <code>docs/DEMO-SCRIPT.md</code>. This is the single highest-value item left: three of the four judging criteria are decided by what a judge sees, not by the test suite.</li>
     <li><b>Listen to the harness.</b> Run <code>python scripts/seed_demo.py &amp;&amp; python -m recall.server</code>, open <code>localhost:8080</code>, and do a full review by ear. Verbosity you can only hear is the one defect I cannot detect, and it is exactly what this harness exists to find.</li>
-    <li><b>Confirm the MIT licence shows in the repo&rsquo;s <i>About</i> panel.</b> The rules require it visible there, not merely present as a file. One look at the page.</li>
+    <li><b>Write the repo&rsquo;s <i>About</i> description.</b> The licence now shows there, but the panel still says &ldquo;No description, website, or topics provided&rdquo; &mdash; the first line a judge reads on the page. One sentence plus a few topics.</li>
     <li><b>Redeem the $150 credits</b> when the email arrives &mdash; Billing &rarr; Credits &rarr; Redeem.</li>
     <li><b>Fill in country of residence</b> and upload a 3:2 thumbnail when you paste the submission.</li>
   </ul>
@@ -265,22 +265,22 @@
     </div>
   </li>
 
-  <li class="active">
+  <li class="done">
     <div class="card">
-      <div class="hd"><h3>Harden and open-source PR</h3><span class="when">Days 37&ndash;41</span><span class="pill p-accent">Current</span></div>
+      <div class="hd"><h3>Harden and open-source PR</h3><span class="when">Days 37&ndash;41</span><span class="pill p-good">Done</span></div>
       <p class="goal">Make the repo runnable by a stranger in five minutes, and earn the second mini challenge.</p>
       <ul class="tasks">
         <li class="ok">README verified by cloning the pushed repo into an empty directory and following it literally. It worked &mdash; and it caught a tool table still advertising <code>grade_response</code>, which D7 replaced.</li>
         <li class="ok">Open-source contribution built and pushed: <a href="https://github.com/khalidbench1-collab/fastmcp/tree/banner-server-url">fastmcp @ banner-server-url</a> &mdash; FastMCP&rsquo;s startup banner now prints the URL the server is listening on, with three tests. Verified by running a real server. The rules accept a branch or fork, so this counts as it stands.</li>
-        <li>Licence confirmed visible in the GitHub <b>About</b> section &mdash; <b>needs you</b>, one look at the repo page</li>
+        <li class="ok">Licence confirmed visible in the GitHub <b>About</b> section &mdash; the sidebar reads <b>MIT license</b> on the public repo page</li>
       </ul>
       <div class="exit"><b>Exit:</b> judges who cannot run a project fall back on the video alone &mdash; this stage removes that risk.</div>
     </div>
   </li>
 
-  <li>
+  <li class="active">
     <div class="card">
-      <div class="hd"><h3>Demo video</h3><span class="when">Days 42&ndash;45</span><span class="pill p-idle">Pending</span></div>
+      <div class="hd"><h3>Demo video</h3><span class="when">Days 42&ndash;45</span><span class="pill p-accent">Current</span></div>
       <p class="goal">Under three minutes, strongest thirty seconds first.</p>
       <ul class="tasks">
         <li class="ok">Shot list, timings and pre-record checklist written &mdash; cold open at 0:08, calibration evidence at 0:35, architecture at 1:05, close by 2:10</li>
