@@ -121,8 +121,6 @@ so any MCP client drives it:
 
 | Document | Purpose |
 |---|---|
-| [`progress.html`](progress.html) | Stage-by-stage build tracker — open it in a browser |
-| [`submission.html`](submission.html) | Every Devpost field, paste-ready — open it in a browser |
 | [`docs/DEMO-SCRIPT.md`](docs/DEMO-SCRIPT.md) | Demo video script, timed to the second |
 | [`docs/FRICTION-LOG.md`](docs/FRICTION-LOG.md) | Live friction log (worth up to a 10% judging bonus) |
 | [`docs/PRODUCT-FEEDBACK.md`](docs/PRODUCT-FEEDBACK.md) | Required per-SDK product feedback, written as we go |

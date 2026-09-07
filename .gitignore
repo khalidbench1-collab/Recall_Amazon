@@ -14,3 +14,9 @@ build/
 
 # Local virtualenv
 .venv/
+
+# Private working material - drafts and tracking, not part of the deliverable
+progress.html
+submission.html
+docs/SUBMISSION.md
+docs/SUBMISSION-CHECKLIST.md
