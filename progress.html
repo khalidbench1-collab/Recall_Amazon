@@ -117,7 +117,8 @@
   <div class="stat"><span class="k">Days remaining</span><span class="v acc" id="days">&mdash;</span></div>
   <div class="stat"><span class="k">Track</span><span class="v sm">Alexa+</span></div>
   <div class="stat"><span class="k">Stacked prizes</span><span class="v sm">$35,000</span></div>
-  <div class="stat"><span class="k">Field</span><span class="v sm">2,479 entrants</span></div>
+  <div class="stat"><span class="k">Stages done</span><span class="v sm">7 of 10</span></div>
+  <div class="stat"><span class="k">Tests</span><span class="v sm">80 green</span></div>
 </div>
 
 <div class="bar"><i id="fill"></i></div>
@@ -125,17 +126,26 @@
 
 <h2>Waiting on you</h2>
 <div class="card">
-  <p class="goal">Everything that can be built without you is built. These are the items only you can clear &mdash; each one is an account, a form or a decision, not code.</p>
+  <p class="goal">Stages 0 to 6 are complete and the whole thing runs end to end against live Bedrock. Nothing below blocks any remaining build work &mdash; these are the things that need a human, a decision, or a voice.</p>
   <ul class="tasks">
-    <li><b>Nothing is blocking the build.</b> Stages 0 to 5 are complete and the server runs end to end against live Bedrock. What follows is submission admin only.</li>
-    <li><b>Confirm the licence is visible in the repo&rsquo;s <i>About</i> panel</b> at <a href="https://github.com/khalidbench1-collab/Recall_Amazon">Recall_Amazon</a>. GitHub usually detects <code>LICENSE</code> automatically, but the rules require it visible there, so it is worth one look.</li>
-    <li><b>Create the public GitHub repo</b> and confirm the MIT licence shows in the <b>About</b> panel. This is a hard submission requirement and it is worth zero points until a judge can see it.</li>
-    <li><b>Redeem the $150 promotional credits</b> when the email lands &mdash; Billing &rarr; Credits &rarr; Redeem.</li>
-    <li><b>Decide the AWS Builder route</b> before stage 4 ends. A single Bedrock call is what the judges name as the <i>obvious</i> answer; either build with Kiro Crew, which qualifies on its own, or give a second AWS service real work to do.</li>
+    <li><b>Record the demo video.</b> Script is timed to the second in <code>docs/DEMO-SCRIPT.md</code>. This is the single highest-value item left: three of the four judging criteria are decided by what a judge sees, not by the test suite.</li>
+    <li><b>Listen to the harness.</b> Run <code>python scripts/seed_demo.py &amp;&amp; python -m recall.server</code>, open <code>localhost:8080</code>, and do a full review by ear. Verbosity you can only hear is the one defect I cannot detect, and it is exactly what this harness exists to find.</li>
+    <li><b>Confirm the MIT licence shows in the repo&rsquo;s <i>About</i> panel.</b> The rules require it visible there, not merely present as a file. One look at the page.</li>
+    <li><b>Redeem the $150 credits</b> when the email arrives &mdash; Billing &rarr; Credits &rarr; Redeem.</li>
+    <li><b>Fill in country of residence</b> and upload a 3:2 thumbnail when you paste the submission.</li>
   </ul>
-  <div class="exit"><b>Not blocking:</b> stage 4 can start without any of these. The grader prompt, the calibration fixture set and its scoring bands are all written and tested against recorded answers before a live model is ever called.</div>
+  <div class="exit"><b>Everything else is drafted.</b> Open <a href="submission.html">submission.html</a> for every Devpost field in the form&rsquo;s own order, with copy buttons and live character counts.</div>
 </div>
 
+<h2>Two decisions still open</h2>
+<div class="card">
+  <p class="goal">Neither blocks anything. Both are worth deciding rather than drifting into by default.</p>
+  <ul class="tasks">
+    <li><b>The AWS Builder route.</b> Worth $5,000 cash plus $5,000 in credits, and it does <i>not</i> affect the $25,000 Alexa+ track prize. The judges name &ldquo;a single Bedrock call for text generation&rdquo; as the <i>obvious</i> answer, which is precisely what <code>grader.py</code> is. Two documented ways out: build with <b>Kiro Crew</b>, which the rules say qualifies on its own without a second runtime service, or give a second AWS service real work. <b>AgentCore is Paid-plan exclusive</b>, so it is unavailable on the current account. Leaning towards Kiro, because bolting on a service purely to score points is the decoration judges penalise &mdash; but I have not verified what Kiro Crew is, whether it is free, or whether it runs on Windows, and I will not recommend a route I have not checked.</li>
+    <li><b>The upstream FastMCP issue.</b> The fix is built, tested and pushed to the fork, which already satisfies the Open Source mini challenge. What is missing is visibility: judges call a &ldquo;bug fix that unblocks other developers&rdquo; creative, and a branch nobody upstream has seen unblocks nobody. FastMCP requires enhancements to start as an issue with a design proposal, so the sequence is issue &rarr; assignment &rarr; PR. Posting it is public content under your GitHub account, so it is your call; I would draft it for approval first.</li>
+  </ul>
+  <div class="exit"><b>Keep the proportion in view:</b> the Alexa+ track is $25,000 and the evidence there &mdash; calibration, latency measurements, friction log &mdash; is already strong. Distorting the architecture for the $5,000 side prize would be a bad trade.</div>
+</div>
 
 <h2>Stages</h2>
 
@@ -152,10 +162,10 @@
         <li class="ok">Architecture and design spec written</li>
         <li class="ok">Friction log and product feedback files opened</li>
         <li class="ok">Submission checklist drafted</li>
-        <li>Public GitHub repo created, licence visible in <b>About</b></li>
-        <li><b>Register on Devpost</b> &mdash; the page still shows a &ldquo;Join hackathon&rdquo; button, so this may be undone. It gates everything, including submitting.</li>
-        <li><b>Request the $150 AWS credits</b> (<a href="https://forms.gle/5hyhr1u6x3fuV2aW7">form</a>) &mdash; registered entrants only, closes 21 Oct, <i>while supplies last</i>. Covers roughly 75,000 graded cards, which is the whole project many times over.</li>
-        <li><b>Create the AWS account and enable Bedrock access</b> &mdash; the live blocker on stage 1 and the critical path to stage 4.</li>
+        <li class="ok">Public GitHub repo created &mdash; <a href="https://github.com/khalidbench1-collab/Recall_Amazon">Recall_Amazon</a></li>
+        <li class="ok">Registered on Devpost &mdash; project exists as a draft, 1 of 5 steps done</li>
+        <li class="ok">$150 AWS credits requested &mdash; <b>redeem when the email arrives</b> (Billing &rarr; Credits)</li>
+        <li class="ok">AWS account created, MFA on, Bedrock API key issued, live grading working</li>
       </ul>
       <div class="exit"><b>Exit:</b> a judge could clone this and understand the intent without running anything.</div>
     </div>
@@ -169,15 +179,15 @@
         <li class="ok">Confirm what Alexa+ Preview access a hackathon entrant actually gets &mdash; the <b>MCP Toolkit</b> is the documented path</li>
         <li class="ok">Stand up a hello-world MCP server over Streamable HTTP &mdash; <code>spike/hello_mcp.py</code></li>
         <li class="ok">Connect from a real MCP client &mdash; <code>fastmcp.Client</code> and raw <code>curl</code> both handshake at <b>protocol 2025-11-25</b>; <code>.mcp.json</code> registers it for Claude Code</li>
-        <li class="ok">Confirm Bedrock model availability and region &mdash; <code>us.anthropic.claude-sonnet-5</code>, geo profile mandatory</li>
-        <li class="ok">Made a live Bedrock call &mdash; <code>ready</code>, 1771&nbsp;ms. Sonnet 5 is listed in the catalogue but refuses to invoke on a Free plan account, so the grader runs on <b>Sonnet 4.5</b>; Haiku 4.5 and Nova Lite also verified working.</li>
-        <li class="ok">Log every surprise in <code>docs/FRICTION-LOG.md</code> &mdash; four entries, two of them major</li>
+        <li class="ok">Confirm Bedrock model availability and region &mdash; geo profile prefix is mandatory, and a five-model probe established that Sonnet 5 and Fable 5.1 are refused on a Free plan while Sonnet 4.6, Opus 4.6, Haiku 4.5 and Nova Lite all invoke</li>
+        <li class="ok">Made a live Bedrock call &mdash; <code>ready</code>, 1771&nbsp;ms. Sonnet 5 is listed in the catalogue but refuses to invoke on a Free plan account, so the grader runs on <b>Sonnet 4.6</b> &mdash; newer and faster than the 4.5 it replaced, 1054&nbsp;ms against 1510.</li>
+        <li class="ok">Log every surprise in <code>docs/FRICTION-LOG.md</code> &mdash; now seven entries, three of them major</li>
       </ul>
-      <div class="exit"><b>Exit:</b> a real MCP client gets a real response from a locally hosted server, and one Bedrock call has returned. <b>Half met.</b> The MCP half is proven end to end; the Bedrock half waits on credentials. The spike also cost the plan a new decision &mdash; Alexa+ enforces a sub-500&nbsp;ms tool round trip, so grading had to be split into two calls (D7).</div>
+      <div class="exit"><b>Exit met.</b> A real MCP client gets a real response from a locally hosted server, and a live Bedrock call returned. The spike also cost the plan a new decision &mdash; Alexa+ enforces a sub-500&nbsp;ms tool round trip, so grading had to be split into two calls (D7). Finding that on day one rather than in October is the entire argument for spiking first.</div>
     </div>
   </li>
 
-  <li>
+  <li class="done">
     <div class="card">
       <div class="hd"><h3>Scheduler, test-first</h3><span class="when">Days 4&ndash;8 &middot; done 6 Sep</span><span class="pill p-good">Done</span></div>
       <p class="goal">SM-2 as pure functions. Correctness matters most here and is cheapest to verify here, which is why it leads.</p>
@@ -192,7 +202,7 @@
     </div>
   </li>
 
-  <li>
+  <li class="done">
     <div class="card">
       <div class="hd"><h3>Store</h3><span class="when">Days 9&ndash;13 &middot; done 6 Sep</span><span class="pill p-good">Done</span></div>
       <p class="goal">SQLite, one file, cards plus an append-only review log.</p>
@@ -224,10 +234,10 @@
     </div>
   </li>
 
-  <li>
+  <li class="done">
     <div class="card">
       <div class="hd"><h3>MCP server and speech shaping</h3><span class="when">Days 23&ndash;30 &middot; done 7 Sep</span><span class="pill p-good">Done</span></div>
-      <p class="goal">Four tools wired to the domain modules, with every response written to be heard rather than read.</p>
+      <p class="goal">Five tools wired to the domain modules, with every response written to be heard rather than read.</p>
       <ul class="tasks">
         <li class="ok">Five tools, not four &mdash; D7 split grading into <code>submit_answer</code> and <code>get_grade</code>. With <code>add_card</code>, <code>next_due_card</code> and <code>get_streak_summary</code>.</li>
         <li class="ok">Response length caps and markup stripping, enforced by tests rather than by discipline</li>
@@ -273,10 +283,11 @@
       <div class="hd"><h3>Demo video</h3><span class="when">Days 42&ndash;45</span><span class="pill p-idle">Pending</span></div>
       <p class="goal">Under three minutes, strongest thirty seconds first.</p>
       <ul class="tasks">
-        <li class="ok">Script written to the second in <code>docs/DEMO-SCRIPT.md</code> &mdash; cold open on the payoff, calibration evidence at 0:35, architecture at 1:05 &mdash; <b>needs you to record it</b></li>
-        <li>Architecture explained second, briefly</li>
-        <li>No third-party trademarks or licensed music</li>
-        <li>Public on YouTube or Vimeo, in English</li>
+        <li class="ok">Shot list, timings and pre-record checklist written &mdash; cold open at 0:08, calibration evidence at 0:35, architecture at 1:05, close by 2:10</li>
+        <li class="ok">Rules discipline baked into the script: no trademarks, no licensed music, English, and the <b>SIMULATED</b> label must stay in frame</li>
+        <li><b>Needs you:</b> record it. Run one review privately first &mdash; grading is non-deterministic and you want to know roughly what it says before the take.</li>
+        <li><b>Needs you:</b> upload public to YouTube, then watch it once logged out to confirm it plays</li>
+        <li><b>Needs you:</b> a 3:2 thumbnail &mdash; the harness mid-review with <code>acknowledged in 18&nbsp;ms</code> visible makes the whole argument in one image</li>
       </ul>
       <div class="exit"><b>Exit:</b> the first thirty seconds alone would earn a shortlist.</div>
     </div>
@@ -289,7 +300,9 @@
       <ul class="tasks">
         <li class="ok">Product feedback complete for MCP, FastMCP, Amazon Bedrock and the Alexa+ tooling</li>
         <li class="ok">Friction log complete &mdash; seven entries, three major, each with severity, workaround and an actionable suggestion</li>
-        <li class="ok">Every submission field drafted and paste-ready in <a href="submission.html">submission.html</a> &mdash; Devpost's own field order, copy buttons, live character counts, both mini challenges &mdash; <b>needs you to review and paste</b></li>
+        <li class="ok">Every submission field drafted and paste-ready in <a href="submission.html">submission.html</a> &mdash; Devpost's own field order, copy buttons, live character counts, both mini challenges</li>
+        <li><b>Needs you:</b> paste it in. Two fields are surprising and are already handled &mdash; the friction log takes a <b>URL</b>, not prose, and the five feedback questions are asked per question across all tools rather than per tool.</li>
+        <li><b>Needs you:</b> country of residence &mdash; deliberately not guessed</li>
         <li>Submitted with days to spare, not hours</li>
       </ul>
       <div class="exit"><b>Exit:</b> submitted before 21 October. Never submit on deadline day.</div>
@@ -322,8 +335,14 @@
     var gone = Math.min(Math.max((now - start) / day, 0), total);
     var pct = Math.round((gone / total) * 100);
     document.getElementById("fill").style.width = pct + "%";
+    // Two numbers, because they disagree and the disagreement is the point:
+    // calendar time spent, and how much of the plan is actually finished.
+    var stagesDone = document.querySelectorAll("ol.stages > li.done").length;
+    var stagesAll = document.querySelectorAll("ol.stages > li").length;
     document.getElementById("barlbl").textContent =
-      "Day " + Math.round(gone) + " of " + Math.round(total) + " · " + pct + "% of the window elapsed";
+      "Day " + Math.round(gone) + " of " + Math.round(total) + " · " + pct +
+      "% of the window elapsed · " + stagesDone + " of " + stagesAll +
+      " stages done (planned through day 36)";
   })();
 </script>
 </body>
