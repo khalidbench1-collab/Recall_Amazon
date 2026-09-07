@@ -131,6 +131,15 @@ class Store:
             params.append(limit)
         return [self._card(row) for row in self._db.execute(sql, params)]
 
+    def list_prompts(self) -> set[str]:
+        """Every card's prompt, whatever its schedule.
+
+        Distinct from list_due_cards on purpose: "does this card exist" and
+        "is this card owed" are different questions, and answering the first
+        with the second duplicates any card that has been reviewed.
+        """
+        return {row[0] for row in self._db.execute("SELECT prompt FROM cards")}
+
     def reschedule(self, card_id: int, *, due_at: datetime) -> None:
         """Move a card's next due date without recording a review."""
         self._db.execute(

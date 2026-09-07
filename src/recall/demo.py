@@ -82,7 +82,7 @@ def seed(store: Store, *, now: datetime) -> int:
     Idempotent on purpose. A demo gets re-recorded, and the second take should
     not face twice the review pile of the first.
     """
-    existing = {card.prompt for card in store.list_due_cards(now=now)}
+    existing = store.list_prompts()
     added = 0
     for prompt, answer in DEMO_DECK:
         if prompt in existing:

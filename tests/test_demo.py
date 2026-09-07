@@ -1,6 +1,6 @@
 """The demo deck has to be reproducible: the video depends on it."""
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -31,6 +31,24 @@ def test_seeding_twice_does_not_duplicate_the_deck(store: Store) -> None:
     seed(store, now=NOW)
     seed(store, now=NOW)
     assert len(store.list_due_cards(now=NOW)) == len(DEMO_DECK)
+
+
+def test_seeding_after_a_review_does_not_duplicate_that_card(store: Store) -> None:
+    """The case that actually happens: a practice take, then a re-seed.
+
+    Reviewing a card pushes it out of the due window. If idempotency is judged
+    on what is due rather than on what exists, the card comes back a second
+    time - and the duplicate is the one the demo opens on.
+    """
+    seed(store, now=NOW)
+    reviewed = store.list_due_cards(now=NOW)[0]
+    store.reschedule(reviewed.id, due_at=NOW + timedelta(days=3))
+
+    assert seed(store, now=NOW) == 0
+
+    later = NOW + timedelta(days=365)
+    prompts = [card.prompt for card in store.list_due_cards(now=later)]
+    assert len(prompts) == len(set(prompts)) == len(DEMO_DECK)
 
 
 def test_the_deck_has_no_duplicate_prompts() -> None:
