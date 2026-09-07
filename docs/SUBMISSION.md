@@ -1,7 +1,15 @@
 # Devpost submission — draft text
 
-Paste-ready answers for each required field. Review before submitting; the numbers are
-current as of 7 September 2026 and should be re-checked at submission time.
+> **Use [`submission.html`](../submission.html) to actually fill the form.** Open it in a
+> browser: every field in Devpost's own order, with copy buttons and live character
+> counts against the real limits. This file is the plain-text twin - if you change an
+> answer, change it in both.
+
+Reviewed against the live form on 7 September 2026. Two things differ from an obvious
+reading of the rules: the **friction log field takes a URL**, not pasted text, and the
+**five feedback questions are asked per question across all tools**, not per tool - so
+the per-tool write-up in `PRODUCT-FEEDBACK.md` has to be transposed before pasting.
+`submission.html` has it transposed already.
 
 ---
 
